@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المبيعات</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 25px; text-align: center; }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 25px; background: #f8f9fa; }
+        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; border-left: 5px solid; }
+        .stat-card.blue { border-color: #3498db; } .stat-card.purple { border-color: #9b59b6; }
+        .stat-card.green { border-color: #2ecc71; } .stat-card.orange { border-color: #e67e22; }
+        .stat-number { font-size: 2.5em; font-weight: bold; margin: 10px 0; }
+        .blue-text { color: #3498db; } .purple-text { color: #9b59b6; } .green-text { color: #2ecc71; } .orange-text { color: #e67e22; } .red-text { color: #e74c3c; }
+        .controls { padding: 25px; background: white; border-bottom: 1px solid #eee; }
+        .input-group { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 15px; margin-bottom: 20px; }
+        @media (max-width: 768px) { .input-group { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr; } .header h1 { font-size: 1.8em; } .stat-number { font-size: 2em; } }
+        input, select, button { padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { background: #3498db; color: white; border: none; cursor: pointer; } button:hover { background: #2980b9; }
+        .clear-btn { background: #e74c3c; margin-top: 10px; } .clear-btn:hover { background: #c0392b; }
+        .transactions { padding: 25px; } .transaction-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .transaction-table th, .transaction-table td { padding: 15px; text-align: center; border-bottom: 1px solid #eee; }
+        .transaction-table th { background: #34495e; color: white; }
+        .normal { background: #ebf5fb; border-left: 4px solid #3498db; }
+        .flexy { background: #f4ecf7; border-left: 4px solid #9b59b6; }
+        .type-badge { padding: 5px 12px; border-radius: 20px; color: white; font-size: 14px; }
+        .type-normal { background: #3498db; } .type-flexy { background: #9b59b6; }
+        .price-display { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 10px; text-align: center; }
+        .flexy-price { color: #9b59b6; font-weight: bold; }
+        .normal-price { color: #3498db; font-weight: bold; }
+        .profit-display { color: #2ecc71; font-weight: bold; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header"><h1>🚀 نظام إدارة المبيعات</h1><p>إحصائيات حية وتقارير مفصلة</p></div>
+        
+        <div class="stats-grid">
+            <div class="stat-card blue"><h3>🟦 المبيعات العادية</h3><div class="stat-number blue-text" id="normalSales">0 دينار</div><p id="normalCount">0 عملية بيع</p></div>
+            <div class="stat-card purple"><h3>🟪 مبيعات فليكسي</h3><div class="stat-number purple-text" id="flexySales">0 دينار</div><p id="flexyCount">0 عملية بيع</p></div>
+            <div class="stat-card green"><h3>💰 الربح اليومي</h3><div class="stat-number green-text" id="dailyProfit">0 دينار</div><p id="dailyCount">0 عملية اليوم</p></div>
+            <div class="stat-card orange"><h3>📈 الربح الشهري</h3><div class="stat-number orange-text" id="monthlyProfit">0 دينار</div><p id="monthlyCount">0 عملية هذا الشهر</p></div>
+        </div>
+        
+        <div class="controls">
+            <h3>➕ إضافة عملية بيع جديدة</h3>
+            
+            <div class="input-group">
+                <input type="number" id="usdPrice" placeholder="سعر الدولار (مثال: 1)" step="0.01" oninput="calculateProfit()">
+                <input type="number" id="exchangeRate" value="255" placeholder="سعر الصرف" step="0.01" oninput="calculateProfit()">
+                <input type="number" id="productPrice" placeholder="سعر المنتج (دينار)" step="0.01" oninput="calculateProfit()">
+                <select id="paymentType" onchange="calculateProfit()">
+                    <option value="normal">دفع عادي (ccp/baridi/يد بيد)</option>
+                    <option value="flexy">دفع فليكسي</option>
+                </select>
+                <button onclick="addTransaction()">إضافة العملية</button>
+            </div>
+            
+            <div class="price-display">
+                <div id="profitCalculation">
+                    ← أدخل الأسعار لرؤية حساب الربح
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button class="clear-btn" onclick="clearAllData()">مسح كل البيانات</button>
+            </div>
+        </div>
+        
+        <div class="transactions">
+            <h3>📋 سجل الحركات المالية</h3>
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>#</th><th>النوع</th><th>سعر $</th><th>التكلفة</th>
+                        <th>سعر المنتج</th><th>الربح</th><th>التاريخ</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        console.log("🚀 بدء النظام...");
+        let exchangeRate = 255;
+        let transactions = JSON.parse(localStorage.getItem('salesTransactions')) || [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("✅ HTML محمل");
+            updateAll();
+        });
+        
+        // حساب الربح تلقائياً
+        function calculateProfit() {
+            const usdPrice = parseFloat(document.getElementById('usdPrice').value) || 0;
+            const rate = parseFloat(document.getElementById('exchangeRate').value) || exchangeRate;
+            const productPrice = parseFloat(document.getElementById('productPrice').value) || 0;
+            const paymentType = document.getElementById('paymentType').value;
+            
+            if (usdPrice <= 0 || productPrice <= 0) {
+                document.getElementById('profitCalculation').innerHTML = 
+                    '<span style="color: #666;">← أدخل جميع الأسعار لرؤية حساب الربح</span>';
+                return;
+            }
+            
+            // تحديث سعر الصرف
+            exchangeRate = rate;
+            
+            // حساب التكلفة
+            let cost, profit, calculationText;
+            
+            if (paymentType === 'flexy') {
+                // حساب فليكسي: (الدولار × الصرف) ÷ 0.82
+                cost = (usdPrice * rate) / 0.82;
+                profit = productPrice - cost;
+                calculationText = `
+                    <div>💰 <span class="normal-price">التكلفة العادية:</span> ${formatNumber(usdPrice * rate)} دينار</div>
+                    <div>💳 <span class="flexy-price">التكلفة بفليكسي:</span> ${formatNumber(cost)} دينار</div>
+                    <div>🏷️ <span>سعر المنتج:</span> ${formatNumber(productPrice)} دينار</div>
+                    <div class="profit-display">🤑 الربح: ${formatNumber(profit)} دينار</div>
+                    <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                        (الحساب: (${usdPrice} × ${rate}) ÷ 0.82 = ${formatNumber(cost)} ← ${formatNumber(productPrice)} - ${formatNumber(cost)} = ${formatNumber(profit)})
+                    </div>
+                `;
+            } else {
+                // حساب عادي: الدولار × الصرف
+                cost = usdPrice * rate;
+                profit = productPrice - cost;
+                calculationText = `
+                    <div>💰 <span class="normal-price">التكلفة:</span> ${formatNumber(cost)} دينار</div>
+                    <div>🏷️ <span>سعر المنتج:</span> ${formatNumber(productPrice)} دينار</div>
+                    <div class="profit-display">🤑 الربح: ${formatNumber(profit)} دينار</div>
+                    <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                        (الحساب: ${usdPrice} × ${rate} = ${formatNumber(cost)} ← ${formatNumber(productPrice)} - ${formatNumber(cost)} = ${formatNumber(profit)})
+                    </div>
+                `;
+            }
+            
+            document.getElementById('profitCalculation').innerHTML = calculationText;
+        }
+        
+        // تحديث كل شيء
+        function updateAll() {
+            updateStatistics();
+            updateTransactionsTable();
+        }
+        
+        // إضافة عملية جديدة
+        function addTransaction() {
+            const usdPrice = parseFloat(document.getElementById('usdPrice').value);
+            const productPrice = parseFloat(document.getElementById('productPrice').value);
+            const paymentType = document.getElementById('paymentType').value;
+            
+            if (!usdPrice || usdPrice <= 0 || !productPrice || productPrice <= 0) {
+                alert('⚠️ أدخل جميع الأسعار');
+                return;
+            }
+            
+            // حساب التكلفة والربح
+            let cost, profit;
+            
+            if (paymentType === 'flexy') {
+                // حساب فليكسي
+                cost = (usdPrice * exchangeRate) / 0.82;
+                profit = productPrice - cost;
+            } else {
+                // حساب عادي
+                cost = usdPrice * exchangeRate;
+                profit = productPrice - cost;
+            }
+            
+            const transaction = {
+                id: transactions.length + 1,
+                type: paymentType,
+                usdPrice: usdPrice,
+                cost: cost,           // التكلفة المحسوبة
+                productPrice: productPrice, // سعر المنتج المدخل
+                profit: profit,       // الربح المحسوب
+                date: new Date().toLocaleString('en-US'),
+                day: new Date().toDateString(),
+                month: new Date().getMonth() + '-' + new Date().getFullYear()
+            };
+            
+            transactions.push(transaction);
+            localStorage.setItem('salesTransactions', JSON.stringify(transactions));
+            updateAll();
+            
+            // تفريغ الحقول
+            document.getElementById('usdPrice').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('profitCalculation').innerHTML = 
+                '<span style="color: #666;">← أدخل جميع الأسعار لرؤية حساب الربح</span>';
+            
+            alert(`✅ تمت الإضافة!
+💵 السعر: ${usdPrice}$
+🏷️ المنتج: ${formatNumber(productPrice)} دينار
+💰 التكلفة: ${formatNumber(cost)} دينار
+🤑 الربح: ${formatNumber(profit)} دينار`);
+        }
+        
+        // تحديث الإحصائيات
+        function updateStatistics() {
+            const today = new Date().toDateString();
+            const currentMonth = new Date().getMonth() + '-' + new Date().getFullYear();
+            
+            let dailyProfit = 0, monthlyProfit = 0, normalSales = 0, flexySales = 0;
+            let dailyCount = 0, monthlyCount = 0, normalCount = 0, flexyCount = 0;
+            
+            transactions.forEach(t => {
+                if (t.day === today) {
+                    dailyProfit += t.profit;
+                    dailyCount++;
+                }
+                
+                if (t.month === currentMonth) {
+                    monthlyProfit += t.profit;
+                    monthlyCount++;
+                }
+                
+                if (t.type === 'normal') {
+                    normalSales += t.productPrice;
+                    normalCount++;
+                } else {
+                    flexySales += t.productPrice;
+                    flexyCount++;
+                }
+            });
+            
+            // تنسيق الأرقام الإنجليزية
+            const format = (num) => {
+                if (!num && num !== 0) return '0';
+                return num.toLocaleString('en-US');
+            };
+            
+            document.getElementById('dailyProfit').textContent = format(dailyProfit) + ' دينار';
+            document.getElementById('monthlyProfit').textContent = format(monthlyProfit) + ' دينار';
+            document.getElementById('normalSales').textContent = format(normalSales) + ' دينار';
+            document.getElementById('flexySales').textContent = format(flexySales) + ' دينار';
+            document.getElementById('dailyCount').textContent = dailyCount + ' عملية اليوم';
+            document.getElementById('monthlyCount').textContent = monthlyCount + ' عملية هذا الشهر';
+            document.getElementById('normalCount').textContent = normalCount + ' عملية بيع';
+            document.getElementById('flexyCount').textContent = flexyCount + ' عملية بيع';
+        }
+        
+        // تحديث الجدول
+        function updateTransactionsTable() {
+            const tbody = document.getElementById('transactionsBody');
+            if (!tbody) { console.error("❌ الجدول مفقود"); return; }
+            
+            tbody.innerHTML = '';
+            [...transactions].reverse().forEach(t => {
+                const row = document.createElement('tr');
+                row.className = t.type === 'normal' ? 'normal' : 'flexy';
+                const profitClass = t.profit >= 0 ? 'green-text' : 'red-text';
+                const profitSign = t.profit >= 0 ? '+' : '';
+                
+                // تنسيق الأرقام
+                const formatNum = (num) => num.toLocaleString('en-US');
+                
+                row.innerHTML = `
+                    <td>${t.id}</td>
+                    <td><span class="type-badge type-${t.type}">${t.type === 'normal' ? 'عادي' : 'فليكسي'}</span></td>
+                    <td>${t.usdPrice} $</td>
+                    <td>${formatNum(Math.round(t.cost))} دينار</td>
+                    <td>${formatNum(t.productPrice)} دينار</td>
+                    <td class="${profitClass}">${profitSign}${formatNum(Math.round(t.profit))} دينار</td>
+                    <td>${t.date}</td>`;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // مسح البيانات
+        function clearAllData() {
+            if (confirm('⚠️ مسح كل البيانات؟')) {
+                localStorage.removeItem('salesTransactions');
+                transactions = [];
+                updateAll();
+                alert('🗑️ تم مسح جميع البيانات');
+            }
+        }
+        
+        // دالة مساعدة لتنسيق الأرقام
+        function formatNumber(num) {
+            if (!num && num !== 0) return '0';
+            return Math.round(num).toLocaleString('en-US');
+        }
+        
+        console.log("🎯 النظام جاهز!");
+    </script>
+</body>
+</html>
