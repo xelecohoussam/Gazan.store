@@ -162,131 +162,9 @@
         
         .product-form {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
             gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .payment-options {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-            padding: 15px;
-            background: var(--light);
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-        
-        .payment-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .payment-option:hover {
-            background: rgba(52, 152, 219, 0.1);
-        }
-        
-        .payment-option.selected {
-            border-color: var(--primary);
-            background: rgba(52, 152, 219, 0.1);
-        }
-        
-        .payment-option.normal.selected {
-            border-color: var(--primary);
-            background: rgba(52, 152, 219, 0.1);
-        }
-        
-        .payment-option.flexy.selected {
-            border-color: var(--secondary);
-            background: rgba(155, 89, 182, 0.1);
-        }
-        
-        .payment-radio {
-            display: none;
-        }
-        
-        .payment-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .radio-custom {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .payment-radio:checked + .payment-label .radio-custom {
-            border-color: var(--primary);
-            background: var(--primary);
-        }
-        
-        .payment-radio:checked + .payment-label .radio-custom::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background: white;
-            border-radius: 50%;
-        }
-        
-        .payment-radio:checked + .payment-label.flexy .radio-custom {
-            border-color: var(--secondary);
-            background: var(--secondary);
-        }
-        
-        .payment-icon {
-            font-size: 1.2em;
-        }
-        
-        .normal-icon {
-            color: var(--primary);
-        }
-        
-        .flexy-icon {
-            color: var(--secondary);
-        }
-        
-        .add-btn-container {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        
-        .add-btn {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-            min-width: 200px;
-        }
-        
-        .add-btn:hover {
-            background: var(--success-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+            margin-bottom: 25px;
         }
         
         @media (max-width: 1200px) {
@@ -306,13 +184,6 @@
             }
             .stat-number { font-size: 2em; }
             .transaction-table-wrapper { overflow-x: auto; }
-            .payment-options {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .payment-option {
-                justify-content: center;
-            }
         }
         
         @media (max-width: 480px) {
@@ -678,48 +549,21 @@
         <div class="controls">
             <h3><i class="fas fa-plus-circle"></i> إضافة عملية بيع جديدة</h3>
             
-            <!-- Product Name -->
-            <div style="margin-bottom: 20px;">
-                <input type="text" id="productName" placeholder="اسم المنتج (مثال: MLBB ماس، FF ماس، إلخ)" style="width: 100%;">
-            </div>
-            
-            <!-- Price Inputs -->
             <div class="product-form">
+                <input type="text" id="productName" placeholder="اسم المنتج (مثال: MLBB ماس، FF ماس، إلخ)" style="grid-column: span 2;">
+                
                 <input type="number" id="usdPrice" placeholder="سعر الدولار ($)" step="0.01" oninput="calculateProfit()">
                 <input type="number" id="exchangeRate" value="255" placeholder="سعر الصرف" step="0.01" oninput="calculateProfit()">
                 <input type="number" id="productPrice" placeholder="سعر المنتج (دينار)" step="0.01" oninput="calculateProfit()">
-            </div>
-            
-            <!-- Payment Options -->
-            <div class="payment-options">
-                <div class="payment-option normal selected" onclick="selectPaymentType('normal')" id="normalOption">
-                    <input type="radio" name="paymentType" value="normal" id="normalPayment" class="payment-radio" checked>
-                    <label for="normalPayment" class="payment-label">
-                        <span class="radio-custom"></span>
-                        <i class="fas fa-money-bill-wave payment-icon normal-icon"></i>
-                        <span>دفع عادي (CCP/بريدي/يد بيد)</span>
-                    </label>
-                </div>
                 
-                <div class="payment-option flexy" onclick="selectPaymentType('flexy')" id="flexyOption">
-                    <input type="radio" name="paymentType" value="flexy" id="flexyPayment" class="payment-radio">
-                    <label for="flexyPayment" class="payment-label flexy">
-                        <span class="radio-custom"></span>
-                        <i class="fas fa-credit-card payment-icon flexy-icon"></i>
-                        <span>دفع فليكسي</span>
-                    </label>
-                </div>
+                <select id="paymentType" onchange="calculateProfit()">
+                    <option value="normal">دفع عادي (CCP/بريدي/يد بيد)</option>
+                    <option value="flexy">دفع فليكسي</option>
+                </select>
+                
+                <button onclick="addTransaction()"><i class="fas fa-plus"></i> إضافة العملية</button>
             </div>
             
-            <!-- Add Button -->
-            <div class="add-btn-container">
-                <button class="add-btn" onclick="addTransaction()">
-                    <i class="fas fa-plus-circle"></i>
-                    إضافة العملية
-                </button>
-            </div>
-            
-            <!-- Price Calculation Display -->
             <div class="price-display">
                 <div id="profitCalculation">
                     <div style="color: var(--gray);">
@@ -728,7 +572,6 @@
                 </div>
             </div>
             
-            <!-- Action Buttons -->
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="clear-btn" onclick="clearAllData()"><i class="fas fa-trash"></i> مسح كل البيانات</button>
                 <button class="export-btn" onclick="exportData()"><i class="fas fa-file-export"></i> تصدير البيانات</button>
@@ -809,7 +652,6 @@
         let currentFilter = null;
         let editRowId = null;
         let longPressTimer = null;
-        let paymentType = 'normal';
         
         document.addEventListener('DOMContentLoaded', function() {
             console.log("✅ HTML محمل");
@@ -817,28 +659,7 @@
             updateAll();
         });
         
-        // Payment Type Selection
-        function selectPaymentType(type) {
-            paymentType = type;
-            
-            // تحديث الواجهة
-            document.querySelectorAll('.payment-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            if (type === 'normal') {
-                document.getElementById('normalOption').classList.add('selected');
-                document.getElementById('normalPayment').checked = true;
-            } else {
-                document.getElementById('flexyOption').classList.add('selected');
-                document.getElementById('flexyPayment').checked = true;
-            }
-            
-            // إعادة حساب الربح إذا كانت هناك قيم
-            calculateProfit();
-        }
-        
-        // Theme Management
+        // Theme Management - تم التصحيح
         function loadThemePreference() {
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             if (isDarkMode) {
@@ -884,6 +705,7 @@
             const usdPrice = parseFloat(document.getElementById('usdPrice').value) || 0;
             const rate = parseFloat(document.getElementById('exchangeRate').value) || exchangeRate;
             const productPrice = parseFloat(document.getElementById('productPrice').value) || 0;
+            const paymentType = document.getElementById('paymentType').value;
             
             if (usdPrice <= 0 || productPrice <= 0) {
                 document.getElementById('profitCalculation').innerHTML = 
@@ -923,36 +745,25 @@
             document.getElementById('profitCalculation').innerHTML = calculationText;
         }
         
-        // Add Transaction - الإصلاح الكامل
+        // Add Transaction - تم التصحيح (اسم المنتج يدوي)
         function addTransaction() {
-            console.log("➕ محاولة إضافة عملية...");
-            
             const usdPrice = parseFloat(document.getElementById('usdPrice').value);
             const productPrice = parseFloat(document.getElementById('productPrice').value);
+            const paymentType = document.getElementById('paymentType').value;
             const productName = document.getElementById('productName').value.trim();
             
-            // التحقق من المدخلات
-            if (!usdPrice || usdPrice <= 0) {
-                showToast('⚠️ أدخل سعر الدولار', 'error');
-                document.getElementById('usdPrice').focus();
-                return;
-            }
-            
-            if (!productPrice || productPrice <= 0) {
-                showToast('⚠️ أدخل سعر المنتج', 'error');
-                document.getElementById('productPrice').focus();
+            if (!usdPrice || usdPrice <= 0 || !productPrice || productPrice <= 0) {
+                showToast('⚠️ أدخل جميع الأسعار', 'error');
                 return;
             }
             
             if (!productName) {
                 showToast('⚠️ أدخل اسم المنتج', 'error');
-                document.getElementById('productName').focus();
                 return;
             }
             
             let cost, profit;
             
-            // حساب التكلفة والربح
             if (paymentType === 'flexy') {
                 cost = (usdPrice * exchangeRate) / 0.82;
                 profit = productPrice - cost;
@@ -961,7 +772,6 @@
                 profit = productPrice - cost;
             }
             
-            // إنشاء كائن العملية
             const transaction = {
                 id: transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1,
                 productName: productName,
@@ -985,24 +795,19 @@
                 selected: false
             };
             
-            console.log("📝 العملية الجديدة:", transaction);
-            
-            // إضافة العملية
             transactions.push(transaction);
             filteredTransactions = [...transactions];
             localStorage.setItem('salesTransactions', JSON.stringify(transactions));
-            
-            // تحديث الواجهة
             updateAll();
             
-            // إعادة تعيين الحقول
+            // Reset form
             document.getElementById('productName').value = '';
             document.getElementById('usdPrice').value = '';
             document.getElementById('productPrice').value = '';
             document.getElementById('profitCalculation').innerHTML = 
                 '<div style="color: var(--gray);"><i class="fas fa-arrow-left"></i> أدخل جميع الأسعار لرؤية حساب الربح</div>';
             
-            showToast(`✅ تمت إضافة "${productName}" بنجاح! الربح: ${formatNumber(profit)} دينار`, 'success');
+            showToast(`✅ تمت إضافة عملية "${productName}" بنجاح! الربح: ${formatNumber(profit)} دينار`, 'success');
         }
         
         // Update All
@@ -1054,10 +859,7 @@
         // Update Transactions Table
         function updateTransactionsTable() {
             const tbody = document.getElementById('transactionsBody');
-            if (!tbody) {
-                console.error("❌ لم يتم العثور على الجدول!");
-                return;
-            }
+            if (!tbody) return;
             
             tbody.innerHTML = '';
             
@@ -1146,7 +948,7 @@
             editRowId = id;
             longPressTimer = setTimeout(() => {
                 openDateEditModal(id);
-            }, 800);
+            }, 800); // 0.8 seconds
         }
         
         function clearLongPress() {
@@ -1272,7 +1074,7 @@
             });
         }
         
-        // Filtering
+        // Filtering - تم التصحيح (إزالة فلترة اليوم والأسبوع والشهر)
         function filterTable() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             
@@ -1366,6 +1168,15 @@
             if (!num && num !== 0) return '0';
             return Math.round(num).toLocaleString('en-US');
         }
+        
+        // Event Listeners - تم التصحيح (إزالة event listener الزائد)
+        
+        // Prevent context menu on long press for mobile
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.classList.contains('date-cell')) {
+                e.preventDefault();
+            }
+        });
         
         console.log("🎯 النظام جاهز!");
     </script>
