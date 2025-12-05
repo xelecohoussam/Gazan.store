@@ -427,11 +427,6 @@
             cursor: pointer;
         }
         
-        .product-badge.editing {
-            background: linear-gradient(45deg, var(--warning), var(--warning-dark));
-            animation: pulse 1.5s infinite;
-        }
-        
         .profit-cell {
             cursor: pointer;
             font-weight: bold;
@@ -440,11 +435,6 @@
         
         .profit-cell:hover {
             background: rgba(46, 204, 113, 0.1);
-        }
-        
-        .profit-cell.editing {
-            background: rgba(243, 156, 18, 0.2);
-            animation: pulse 1.5s infinite;
         }
         
         .debtor-badge {
@@ -459,9 +449,8 @@
             cursor: pointer;
         }
         
-        .debtor-badge.editing {
-            background: linear-gradient(45deg, var(--warning), var(--warning-dark));
-            animation: pulse 1.5s infinite;
+        .debtor-badge.paid {
+            background: linear-gradient(45deg, var(--success), var(--success-dark));
         }
         
         .amount-cell {
@@ -473,11 +462,6 @@
             background: rgba(231, 76, 60, 0.1);
         }
         
-        .amount-cell.editing {
-            background: rgba(243, 156, 18, 0.2);
-            animation: pulse 1.5s infinite;
-        }
-        
         .action-buttons {
             display: flex;
             gap: 5px;
@@ -485,7 +469,7 @@
         }
         
         .action-btn {
-            padding: 6px 12px;
+            padding: 8px 12px;
             border-radius: 6px;
             border: none;
             color: white;
@@ -495,6 +479,8 @@
             align-items: center;
             gap: 5px;
             transition: all 0.3s;
+            min-width: 70px;
+            justify-content: center;
         }
         
         .action-btn:hover {
@@ -536,20 +522,85 @@
         
         .date-cell {
             cursor: pointer;
+            font-family: monospace;
         }
         
         .date-cell:hover {
             background: rgba(155, 89, 182, 0.1);
         }
         
-        .paid-badge {
-            background: linear-gradient(45deg, var(--success), var(--success-dark)) !important;
+        /* More Button Styles */
+        .more-btn-container {
+            position: relative;
+            display: inline-block;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        .more-btn {
+            background: var(--secondary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .more-btn:hover {
+            background: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
+        }
+        
+        .more-options {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            min-width: 200px;
+            box-shadow: 0 5px 20px var(--shadow);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .more-options.show {
+            display: flex;
+        }
+        
+        .option-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background: var(--light);
+            color: var(--dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            text-align: right;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .option-btn:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .option-btn.export {
+            color: var(--success);
+        }
+        
+        .option-btn.import {
+            color: var(--primary);
         }
         
         /* Toast Notifications */
@@ -665,6 +716,8 @@
             .payment-options { flex-direction: column; }
             .transaction-table, .debts-table { min-width: 600px; }
             .action-buttons { flex-direction: column; }
+            .more-btn { padding: 10px 15px; }
+            .more-options { min-width: 180px; }
         }
         
         @media (max-width: 480px) {
@@ -673,6 +726,9 @@
             .header, .controls, .transactions { padding: 20px 15px; }
             .stats-grid { padding: 20px 15px; grid-template-columns: 1fr; }
             .action-buttons { flex-direction: column; }
+            .more-btn-container { width: 100%; }
+            .more-btn { width: 100%; justify-content: center; }
+            .more-options { width: 100%; }
         }
         
         input, select, button {
@@ -872,13 +928,24 @@
                 </div>
                 
                 <!-- Sales Action Buttons -->
-                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                     <button class="clear-btn" onclick="clearSalesData()">
                         <i class="fas fa-trash"></i> مسح بيانات المبيعات
                     </button>
-                    <button class="export-btn" onclick="exportSalesData()">
-                        <i class="fas fa-file-export"></i> تصدير المبيعات
-                    </button>
+                    
+                    <div class="more-btn-container">
+                        <button class="more-btn" onclick="toggleMoreOptions('sales')">
+                            <i class="fas fa-ellipsis-h"></i> المزيد
+                        </button>
+                        <div class="more-options" id="salesMoreOptions">
+                            <button class="option-btn export" onclick="exportSalesData()">
+                                <i class="fas fa-file-export"></i> تصدير المبيعات
+                            </button>
+                            <button class="option-btn import" onclick="importSalesData()">
+                                <i class="fas fa-file-import"></i> استيراد المبيعات
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -909,7 +976,7 @@
                                 <th onclick="sortSalesTable('productPrice')">سعر المنتج</th>
                                 <th onclick="sortSalesTable('profit')">الربح</th>
                                 <th onclick="sortSalesTable('date')">التاريخ</th>
-                                <th style="width: 180px;">الإجراءات</th>
+                                <th style="width: 200px;">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="transactionsBody"></tbody>
@@ -953,13 +1020,24 @@
                 </div>
                 
                 <!-- Debts Action Buttons -->
-                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                     <button class="clear-btn" onclick="clearAllDebts()">
                         <i class="fas fa-trash"></i> مسح جميع الديون
                     </button>
-                    <button class="export-btn" onclick="exportDebts()">
-                        <i class="fas fa-file-export"></i> تصدير الديون
-                    </button>
+                    
+                    <div class="more-btn-container">
+                        <button class="more-btn" onclick="toggleMoreOptions('debts')">
+                            <i class="fas fa-ellipsis-h"></i> المزيد
+                        </button>
+                        <div class="more-options" id="debtsMoreOptions">
+                            <button class="option-btn export" onclick="exportDebts()">
+                                <i class="fas fa-file-export"></i> تصدير الديون
+                            </button>
+                            <button class="option-btn import" onclick="importDebts()">
+                                <i class="fas fa-file-import"></i> استيراد الديون
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -979,7 +1057,7 @@
                                 <th onclick="sortDebtsTable('name')">اسم المديون</th>
                                 <th onclick="sortDebtsTable('amount')">مبلغ الدين</th>
                                 <th onclick="sortDebtsTable('date')">التاريخ</th>
-                                <th style="width: 200px;">الإجراءات</th>
+                                <th style="width: 220px;">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="debtsBody"></tbody>
@@ -1004,17 +1082,6 @@
     </div>
     
     <!-- Modals -->
-    <div class="modal" id="editProductModal">
-        <div class="modal-content">
-            <h3 class="modal-title"><i class="fas fa-edit"></i> تعديل بيانات المنتج</h3>
-            <div id="productModalContent"></div>
-            <div class="modal-actions">
-                <button onclick="saveProductEdit()" class="export-btn"><i class="fas fa-save"></i> حفظ</button>
-                <button onclick="closeProductModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
-            </div>
-        </div>
-    </div>
-    
     <div class="modal" id="customProfitModal">
         <div class="modal-content">
             <h3 class="modal-title"><i class="fas fa-money-bill-wave"></i> إضافة ربح مخصص</h3>
@@ -1025,17 +1092,6 @@
             <div class="modal-actions">
                 <button onclick="saveCustomProfit()" class="export-btn"><i class="fas fa-check"></i> تطبيق</button>
                 <button onclick="closeCustomProfitModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="modal" id="editDebtorModal">
-        <div class="modal-content">
-            <h3 class="modal-title"><i class="fas fa-user-edit"></i> تعديل بيانات المديون</h3>
-            <div id="debtorModalContent"></div>
-            <div class="modal-actions">
-                <button onclick="saveDebtorEdit()" class="export-btn"><i class="fas fa-save"></i> حفظ</button>
-                <button onclick="closeDebtorModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div>
     </div>
@@ -1061,30 +1117,17 @@
             </div>
         </div>
     </div>
-    
-    <div class="modal" id="editDateModal">
-        <div class="modal-content">
-            <h3 class="modal-title"><i class="fas fa-calendar-alt"></i> تعديل التاريخ</h3>
-            <div id="editDateModalContent"></div>
-            <div class="modal-actions">
-                <button onclick="saveDateEdit()" class="export-btn"><i class="fas fa-save"></i> حفظ</button>
-                <button onclick="closeDateModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
-            </div>
-        </div>
-    </div>
 
     <script>
-        console.log("🚀 بدء النظام المبسط...");
+        console.log("🚀 بدء النظام...");
         
         // البيانات الرئيسية
         let exchangeRate = 255;
         let currentProfitId = null;
         let currentDebtorId = null;
-        let currentItemId = null;
         let currentTransactionId = null;
         let profitMenuOpen = false;
         let paymentType = 'normal';
-        let currentEditType = ''; // 'sales' أو 'debts'
         let paidDebtsCount = 0;
         
         // تخزين البيانات
@@ -1093,9 +1136,9 @@
         
         // إعدادات العرض
         let currentPage = 'sales';
-        let salesSortColumn = 'date';
+        let salesSortColumn = 'timestamp';
         let salesSortDirection = 'desc';
-        let debtSortColumn = 'date';
+        let debtSortColumn = 'timestamp';
         let debtSortDirection = 'desc';
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -1103,12 +1146,15 @@
             loadThemePreference();
             loadData();
             showPage('sales');
-            preventContextMenu();
             
             // إغلاق القوائم عند النقر خارجها
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.profit-cell') && !e.target.closest('.profit-menu')) {
                     hideProfitMenu();
+                }
+                if (!e.target.closest('.more-btn-container')) {
+                    document.getElementById('salesMoreOptions').classList.remove('show');
+                    document.getElementById('debtsMoreOptions').classList.remove('show');
                 }
             });
         });
@@ -1179,9 +1225,12 @@
             
             let cost = paymentType === 'flexy' ? (usdPrice * exchangeRate) / 0.82 : usdPrice * exchangeRate;
             let profit = productPrice - cost;
+            const now = new Date();
+            const timestamp = now.getTime();
+            const date = formatDate(timestamp);
             
             const transaction = {
-                id: Date.now(),
+                id: timestamp,
                 productName: productName,
                 type: paymentType,
                 usdPrice: usdPrice,
@@ -1189,12 +1238,13 @@
                 productPrice: productPrice,
                 profit: profit,
                 additionalProfits: [],
-                date: new Date().toLocaleString('en-US'),
-                timestamp: Date.now(),
+                date: date,
+                timestamp: timestamp,
                 selected: false
             };
             
-            transactions.push(transaction);
+            // إضافة في بداية المصفوفة للحصول على الأحدث أولاً
+            transactions.unshift(transaction);
             saveSalesData();
             updateSales();
             
@@ -1211,23 +1261,38 @@
         }
         
         function updateSalesStatistics() {
-            const today = new Date().toDateString();
-            const currentMonth = new Date().getMonth() + '-' + new Date().getFullYear();
+            const now = new Date();
+            const today = formatDate(now.getTime());
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
             
-            let stats = { dailyProfit: 0, monthlyProfit: 0, normalSales: 0, flexySales: 0, dailyCount: 0, monthlyCount: 0, normalCount: 0, flexyCount: 0 };
+            let stats = {
+                dailyProfit: 0,
+                monthlyProfit: 0,
+                normalSales: 0,
+                flexySales: 0,
+                dailyCount: 0,
+                monthlyCount: 0,
+                normalCount: 0,
+                flexyCount: 0
+            };
             
             transactions.forEach(t => {
                 const totalProfit = t.profit + (t.additionalProfits?.reduce((sum, p) => sum + p.amount, 0) || 0);
                 const date = new Date(t.timestamp);
                 
-                if (date.toDateString() === today) {
+                // حساب اليومي - باستخدام الصيغة YYYY/MM/DD للمقارنة
+                if (formatDate(t.timestamp) === today) {
                     stats.dailyProfit += totalProfit;
                     stats.dailyCount++;
                 }
-                if (date.getMonth() + '-' + date.getFullYear() === currentMonth) {
+                
+                // حساب الشهري - المقارنة بالشهر والسنة
+                if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
                     stats.monthlyProfit += totalProfit;
                     stats.monthlyCount++;
                 }
+                
                 if (t.type === 'normal') {
                     stats.normalSales += t.productPrice;
                     stats.normalCount++;
@@ -1237,6 +1302,7 @@
                 }
             });
             
+            // تحديث الإحصائيات
             document.getElementById('dailyProfit').textContent = formatNumber(stats.dailyProfit) + ' دينار';
             document.getElementById('monthlyProfit').textContent = formatNumber(stats.monthlyProfit) + ' دينار';
             document.getElementById('normalSales').textContent = formatNumber(stats.normalSales) + ' دينار';
@@ -1253,19 +1319,25 @@
             
             tbody.innerHTML = '';
             
-            transactions.sort((a, b) => {
-                let aVal = a[salesSortColumn];
-                let bVal = b[salesSortColumn];
-                
-                if (salesSortColumn === 'date') {
-                    aVal = a.timestamp;
-                    bVal = b.timestamp;
+            // ترتيب العمليات من الأحدث إلى الأقدم حسب timestamp
+            const sortedTransactions = [...transactions].sort((a, b) => {
+                if (salesSortColumn === 'timestamp') {
+                    return salesSortDirection === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
+                } else if (salesSortColumn === 'productName') {
+                    return salesSortDirection === 'asc' 
+                        ? a.productName.localeCompare(b.productName)
+                        : b.productName.localeCompare(a.productName);
+                } else if (salesSortColumn === 'profit') {
+                    const aProfit = a.profit + (a.additionalProfits?.reduce((sum, p) => sum + p.amount, 0) || 0);
+                    const bProfit = b.profit + (b.additionalProfits?.reduce((sum, p) => sum + p.amount, 0) || 0);
+                    return salesSortDirection === 'asc' ? aProfit - bProfit : bProfit - aProfit;
+                } else if (salesSortColumn === 'date') {
+                    return salesSortDirection === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
                 }
-                
-                return salesSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                return 0;
             });
             
-            transactions.forEach(t => {
+            sortedTransactions.forEach(t => {
                 const totalProfit = t.profit + (t.additionalProfits?.reduce((sum, p) => sum + p.amount, 0) || 0);
                 const profitClass = totalProfit >= 0 ? 'green-text' : 'red-text';
                 const profitSign = totalProfit >= 0 ? '+' : '';
@@ -1275,7 +1347,7 @@
                     <tr class="${t.type === 'normal' ? 'normal' : 'flexy'} ${t.selected ? 'selected' : ''}">
                         <td><input type="checkbox" class="select-checkbox" ${t.selected ? 'checked' : ''} onchange="toggleSelect(${t.id})"></td>
                         <td>
-                            <span class="product-badge" onclick="editProductName(${t.id})">
+                            <span class="product-badge" onclick="editProduct(${t.id})">
                                 ${t.productName}
                                 ${hasAdditional ? ` <small>(+${t.additionalProfits.length})</small>` : ''}
                             </span>
@@ -1285,21 +1357,19 @@
                         <td>${formatNumber(t.cost)} دينار</td>
                         <td>${formatNumber(t.productPrice)} دينار</td>
                         <td class="profit-cell" onclick="showProfitMenu(${t.id}, event)">
-                            ${profitSign}${formatNumber(totalProfit)} دينار
+                            <span class="${profitClass}">${profitSign}${formatNumber(totalProfit)} دينار</span>
                             ${hasAdditional ? ' 💰' : ''}
                         </td>
-                        <td class="date-cell" onclick="editDate('sales', ${t.id})">
-                            ${t.date}
-                        </td>
+                        <td class="date-cell">${t.date}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="action-btn edit-btn" onclick="editProductName(${t.id})">
+                                <button class="action-btn edit-btn" onclick="editProduct(${t.id})" title="تعديل المنتج">
                                     <i class="fas fa-edit"></i> تعديل
                                 </button>
-                                <button class="action-btn profit-btn" onclick="addNewProfit(${t.id})">
-                                    <i class="fas fa-money-bill"></i> ربح جديد
+                                <button class="action-btn profit-btn" onclick="addNewProfit(${t.id})" title="إضافة ربح">
+                                    <i class="fas fa-money-bill"></i> ربح
                                 </button>
-                                <button class="action-btn delete-btn" onclick="deleteTransaction(${t.id})">
+                                <button class="action-btn delete-btn" onclick="deleteTransaction(${t.id})" title="حذف العملية">
                                     <i class="fas fa-trash"></i> حذف
                                 </button>
                             </div>
@@ -1337,6 +1407,7 @@
             `;
             
             document.getElementById('addProfitModal').style.display = 'flex';
+            document.getElementById('newProfitAmount').focus();
         }
         
         function saveNewProfit() {
@@ -1361,7 +1432,7 @@
                 
                 transaction.additionalProfits.push({
                     amount: amount,
-                    date: new Date().toLocaleString('en-US'),
+                    date: formatDate(Date.now()),
                     timestamp: Date.now()
                 });
                 
@@ -1379,131 +1450,19 @@
             currentTransactionId = null;
         }
         
-        // === وظائف تعديل المبيعات ===
-        function editProductName(id) {
+        // === وظائف تعديل المنتج ===
+        function editProduct(id) {
             const transaction = transactions.find(t => t.id === id);
             if (!transaction) return;
             
-            document.getElementById('productModalContent').innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <label>اسم المنتج الحالي:</label>
-                    <div style="background: var(--border); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                        <strong>${transaction.productName}</strong>
-                    </div>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label>الاسم الجديد:</label>
-                    <input type="text" id="newProductName" value="${transaction.productName}" style="width: 100%; margin-top: 5px;">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label>تعديل التاريخ:</label>
-                    <input type="datetime-local" id="newTransactionDate" value="${formatDateForInput(transaction.timestamp)}" style="width: 100%; margin-top: 5px;">
-                </div>
-            `;
-            
-            currentItemId = id;
-            currentEditType = 'sales';
-            document.getElementById('editProductModal').style.display = 'flex';
-        }
-        
-        function saveProductEdit() {
-            const newName = document.getElementById('newProductName').value.trim();
-            const newDate = document.getElementById('newTransactionDate').value;
-            
-            if (currentEditType === 'sales' && currentItemId) {
-                const transaction = transactions.find(t => t.id === currentItemId);
-                if (transaction) {
-                    if (newName) {
-                        transaction.productName = newName;
-                    }
-                    
-                    if (newDate) {
-                        const newTimestamp = new Date(newDate).getTime();
-                        transaction.timestamp = newTimestamp;
-                        transaction.date = new Date(newTimestamp).toLocaleString('en-US');
-                    }
-                    
-                    saveSalesData();
-                    updateSales();
-                    closeProductModal();
-                    showToast('✅ تم تحديث بيانات المنتج', 'success');
-                }
+            // استخدام نافذة prompt البسيطة للتعديل
+            const newName = prompt('تعديل اسم المنتج:', transaction.productName);
+            if (newName !== null && newName.trim() !== '') {
+                transaction.productName = newName.trim();
+                saveSalesData();
+                updateSales();
+                showToast('✅ تم تحديث اسم المنتج', 'success');
             }
-        }
-        
-        function closeProductModal() {
-            document.getElementById('editProductModal').style.display = 'none';
-            currentItemId = null;
-            currentEditType = '';
-        }
-        
-        function editDate(type, id) {
-            currentEditType = type;
-            currentItemId = id;
-            
-            let currentDate, currentTimestamp;
-            
-            if (type === 'sales') {
-                const transaction = transactions.find(t => t.id === id);
-                if (!transaction) return;
-                currentDate = transaction.date;
-                currentTimestamp = transaction.timestamp;
-            } else if (type === 'debts') {
-                const debt = debts.find(d => d.id === id);
-                if (!debt) return;
-                currentDate = debt.date;
-                currentTimestamp = debt.timestamp;
-            }
-            
-            document.getElementById('editDateModalContent').innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <label>التاريخ الحالي:</label>
-                    <div style="background: var(--border); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                        <strong>${currentDate}</strong>
-                    </div>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label>التاريخ الجديد:</label>
-                    <input type="datetime-local" id="newItemDate" value="${formatDateForInput(currentTimestamp)}" style="width: 100%; margin-top: 5px;">
-                </div>
-            `;
-            
-            document.getElementById('editDateModal').style.display = 'flex';
-        }
-        
-        function saveDateEdit() {
-            const newDate = document.getElementById('newItemDate').value;
-            
-            if (!newDate || !currentItemId) return;
-            
-            const newTimestamp = new Date(newDate).getTime();
-            
-            if (currentEditType === 'sales') {
-                const transaction = transactions.find(t => t.id === currentItemId);
-                if (transaction) {
-                    transaction.timestamp = newTimestamp;
-                    transaction.date = new Date(newTimestamp).toLocaleString('en-US');
-                    saveSalesData();
-                    updateSales();
-                }
-            } else if (currentEditType === 'debts') {
-                const debt = debts.find(d => d.id === currentItemId);
-                if (debt) {
-                    debt.timestamp = newTimestamp;
-                    debt.date = new Date(newTimestamp).toLocaleString('en-US');
-                    saveDebtsData();
-                    updateDebts();
-                }
-            }
-            
-            closeDateModal();
-            showToast('✅ تم تحديث التاريخ', 'success');
-        }
-        
-        function closeDateModal() {
-            document.getElementById('editDateModal').style.display = 'none';
-            currentItemId = null;
-            currentEditType = '';
         }
         
         function deleteTransaction(id) {
@@ -1523,7 +1482,7 @@
             currentProfitId = id;
             
             const menu = document.getElementById('profitMenu');
-            const cell = event.target;
+            const cell = event.target.closest('.profit-cell');
             const rect = cell.getBoundingClientRect();
             
             menu.style.display = 'block';
@@ -1549,7 +1508,7 @@
                 
                 transaction.additionalProfits.push({
                     amount: amount,
-                    date: new Date().toLocaleString('en-US'),
+                    date: formatDate(Date.now()),
                     timestamp: Date.now()
                 });
                 
@@ -1593,6 +1552,116 @@
             document.getElementById('customProfitAmount').value = '';
         }
         
+        // === وظائف زر المزيد ===
+        function toggleMoreOptions(type) {
+            const salesOptions = document.getElementById('salesMoreOptions');
+            const debtsOptions = document.getElementById('debtsMoreOptions');
+            
+            // إغلاق جميع القوائم أولاً
+            salesOptions.classList.remove('show');
+            debtsOptions.classList.remove('show');
+            
+            // فتح القائمة المطلوبة
+            if (type === 'sales') {
+                salesOptions.classList.toggle('show');
+            } else if (type === 'debts') {
+                debtsOptions.classList.toggle('show');
+            }
+        }
+        
+        // === وظائف التصدير والاستيراد ===
+        function exportSalesData() {
+            const dataStr = JSON.stringify(transactions, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', `sales-backup-${formatDate(Date.now()).replace(/\//g, '-')}.json`);
+            link.click();
+            
+            showToast('✅ تم تصدير بيانات المبيعات', 'success');
+            document.getElementById('salesMoreOptions').classList.remove('show');
+        }
+        
+        function importSalesData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        // التحقق من صحة البيانات
+                        if (!Array.isArray(importedData)) {
+                            throw new Error('صيغة الملف غير صحيحة');
+                        }
+                        
+                        // دمج البيانات المستوردة مع البيانات الحالية
+                        transactions = [...importedData, ...transactions];
+                        saveSalesData();
+                        updateSales();
+                        
+                        showToast(`✅ تم استيراد ${importedData.length} عملية مبيعات`, 'success');
+                        document.getElementById('salesMoreOptions').classList.remove('show');
+                    } catch (error) {
+                        showToast('❌ خطأ في استيراد البيانات: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        function exportDebts() {
+            const dataStr = JSON.stringify(debts, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', `debts-backup-${formatDate(Date.now()).replace(/\//g, '-')}.json`);
+            link.click();
+            
+            showToast('✅ تم تصدير بيانات الديون', 'success');
+            document.getElementById('debtsMoreOptions').classList.remove('show');
+        }
+        
+        function importDebts() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        // التحقق من صحة البيانات
+                        if (!Array.isArray(importedData)) {
+                            throw new Error('صيغة الملف غير صحيحة');
+                        }
+                        
+                        // دمج البيانات المستوردة مع البيانات الحالية
+                        debts = [...importedData, ...debts];
+                        saveDebtsData();
+                        updateDebts();
+                        
+                        showToast(`✅ تم استيراد ${importedData.length} دين`, 'success');
+                        document.getElementById('debtsMoreOptions').classList.remove('show');
+                    } catch (error) {
+                        showToast('❌ خطأ في استيراد البيانات: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
         // === وظائف المديونين ===
         function addDebt() {
             const name = document.getElementById('debtorName').value.trim();
@@ -1603,15 +1672,17 @@
                 return;
             }
             
+            const timestamp = Date.now();
             const debt = {
-                id: Date.now(),
+                id: timestamp,
                 name: name,
                 amount: amount,
-                date: new Date().toLocaleString('en-US'),
-                timestamp: Date.now()
+                date: formatDate(timestamp),
+                timestamp: timestamp
             };
             
-            debts.push(debt);
+            // إضافة في بداية المصفوفة للحصول على الأحدث أولاً
+            debts.unshift(debt);
             saveDebtsData();
             updateDebts();
             
@@ -1628,8 +1699,9 @@
         }
         
         function updateDebtsStatistics() {
-            const totalDebtors = debts.length;
-            const totalDebts = debts.reduce((sum, d) => sum + d.amount, 0);
+            const activeDebts = debts.filter(d => d.amount > 0);
+            const totalDebtors = activeDebts.length;
+            const totalDebts = activeDebts.reduce((sum, d) => sum + d.amount, 0);
             const averageDebt = totalDebtors > 0 ? totalDebts / totalDebtors : 0;
             
             document.getElementById('totalDebtors').textContent = totalDebtors + ' شخص';
@@ -1645,21 +1717,25 @@
             
             tbody.innerHTML = '';
             
-            debts.sort((a, b) => {
-                let aVal = a[debtSortColumn];
-                let bVal = b[debtSortColumn];
-                
-                if (debtSortColumn === 'date') {
-                    aVal = a.timestamp;
-                    bVal = b.timestamp;
+            // ترتيب الديون من الأحدث إلى الأقدم
+            const sortedDebts = [...debts].sort((a, b) => {
+                if (debtSortColumn === 'timestamp') {
+                    return debtSortDirection === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
+                } else if (debtSortColumn === 'name') {
+                    return debtSortDirection === 'asc' 
+                        ? a.name.localeCompare(b.name)
+                        : b.name.localeCompare(a.name);
+                } else if (debtSortColumn === 'amount') {
+                    return debtSortDirection === 'asc' ? a.amount - b.amount : b.amount - a.amount;
+                } else if (debtSortColumn === 'date') {
+                    return debtSortDirection === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
                 }
-                
-                return debtSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                return 0;
             });
             
-            debts.forEach((d, index) => {
+            sortedDebts.forEach((d, index) => {
                 const isPaid = d.amount <= 0;
-                const badgeClass = isPaid ? 'paid-badge' : '';
+                const badgeClass = isPaid ? 'paid' : '';
                 
                 const row = `
                     <tr>
@@ -1673,18 +1749,16 @@
                         <td class="amount-cell" onclick="updateDebtAmount(${d.id})">
                             ${formatNumber(d.amount)} دينار
                         </td>
-                        <td class="date-cell" onclick="editDate('debts', ${d.id})">
-                            ${d.date}
-                        </td>
+                        <td class="date-cell">${d.date}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="action-btn edit-btn" onclick="editDebtor(${d.id})">
+                                <button class="action-btn edit-btn" onclick="editDebtor(${d.id})" title="تعديل الاسم">
                                     <i class="fas fa-edit"></i> تعديل
                                 </button>
-                                <button class="action-btn update-btn" onclick="updateDebtAmount(${d.id})">
+                                <button class="action-btn update-btn" onclick="updateDebtAmount(${d.id})" title="تحديث المبلغ">
                                     <i class="fas fa-exchange-alt"></i> تحديث
                                 </button>
-                                <button class="action-btn delete-btn" onclick="deleteDebt(${d.id})">
+                                <button class="action-btn delete-btn" onclick="deleteDebt(${d.id})" title="حذف الدين">
                                     <i class="fas fa-trash"></i> حذف
                                 </button>
                             </div>
@@ -1701,70 +1775,37 @@
             
             // التحقق من الديون التي وصلت للصفر
             debts.forEach(debt => {
-                if (debt.amount <= 0) {
-                    debts = debts.filter(d => d.id !== debt.id);
+                if (debt.amount <= 0 && !debt.markedForDeletion) {
+                    debt.markedForDeletion = true;
                     deletedCount++;
                     paidDebtsCount++;
                 }
             });
             
+            // حذف الديون المعلومة بعد فترة وجيزة
             if (deletedCount > 0) {
-                saveDebtsData();
-                updateDebts();
-                showToast(`✅ تم حذف ${deletedCount} دين وصل مبلغه للصفر`, 'success');
+                setTimeout(() => {
+                    debts = debts.filter(d => d.amount > 0);
+                    saveDebtsData();
+                    updateDebts();
+                    if (deletedCount > 0) {
+                        showToast(`✅ تم حذف ${deletedCount} دين وصل مبلغه للصفر`, 'success');
+                    }
+                }, 500);
             }
         }
         
         function editDebtor(id) {
-            currentDebtorId = id;
             const debtor = debts.find(d => d.id === id);
+            if (!debtor) return;
             
-            document.getElementById('debtorModalContent').innerHTML = `
-                <div style="margin-bottom: 20px;">
-                    <label>اسم المديون الحالي:</label>
-                    <div style="background: var(--border); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                        <strong>${debtor.name}</strong>
-                    </div>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label>الاسم الجديد:</label>
-                    <input type="text" id="newDebtorName" value="${debtor.name}" style="width: 100%; margin-top: 5px;">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label>تعديل التاريخ:</label>
-                    <input type="datetime-local" id="newDebtorDate" value="${formatDateForInput(debtor.timestamp)}" style="width: 100%; margin-top: 5px;">
-                </div>
-            `;
-            
-            document.getElementById('editDebtorModal').style.display = 'flex';
-        }
-        
-        function saveDebtorEdit() {
-            const newName = document.getElementById('newDebtorName').value.trim();
-            const newDate = document.getElementById('newDebtorDate').value;
-            
-            if (newName && currentDebtorId) {
-                const debtor = debts.find(d => d.id === currentDebtorId);
-                if (debtor) {
-                    debtor.name = newName;
-                    
-                    if (newDate) {
-                        const newTimestamp = new Date(newDate).getTime();
-                        debtor.timestamp = newTimestamp;
-                        debtor.date = new Date(newTimestamp).toLocaleString('en-US');
-                    }
-                    
-                    saveDebtsData();
-                    updateDebts();
-                    closeDebtorModal();
-                    showToast('✅ تم تحديث بيانات المديون', 'success');
-                }
+            const newName = prompt('تعديل اسم المديون:', debtor.name);
+            if (newName !== null && newName.trim() !== '') {
+                debtor.name = newName.trim();
+                saveDebtsData();
+                updateDebts();
+                showToast('✅ تم تحديث اسم المديون', 'success');
             }
-        }
-        
-        function closeDebtorModal() {
-            document.getElementById('editDebtorModal').style.display = 'none';
-            currentDebtorId = null;
         }
         
         function updateDebtAmount(id) {
@@ -1791,6 +1832,7 @@
             `;
             
             document.getElementById('updateDebtModal').style.display = 'flex';
+            document.getElementById('debtUpdateAmount').focus();
         }
         
         function saveDebtUpdate() {
@@ -1845,7 +1887,24 @@
             }
         }
         
+        function clearSalesData() {
+            if (confirm('⚠️ هل تريد مسح جميع بيانات المبيعات؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                transactions = [];
+                saveSalesData();
+                updateSales();
+                showToast('🗑️ تم مسح جميع بيانات المبيعات', 'success');
+            }
+        }
+        
         // === وظائف مساعدة ===
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        }
+        
         function saveSalesData() {
             localStorage.setItem('salesTransactions', JSON.stringify(transactions));
         }
@@ -1855,18 +1914,8 @@
         }
         
         function formatNumber(num) {
-            if (num === null || num === undefined) return '0';
+            if (num === null || num === undefined || isNaN(num)) return '0';
             return Math.round(num).toLocaleString('en-US');
-        }
-        
-        function formatDateForInput(timestamp) {
-            const date = new Date(timestamp);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
         
         function showToast(message, type = 'info') {
@@ -1901,45 +1950,6 @@
             }
         }
         
-        function preventContextMenu() {
-            document.addEventListener('contextmenu', e => {
-                if (e.target.closest('.product-badge, .profit-cell, .debtor-badge, .amount-cell')) {
-                    e.preventDefault();
-                }
-            });
-        }
-        
-        function exportSalesData() {
-            const dataStr = JSON.stringify(transactions, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-            const link = document.createElement('a');
-            link.setAttribute('href', dataUri);
-            link.setAttribute('download', `sales-backup-${new Date().toISOString().split('T')[0]}.json`);
-            link.click();
-            
-            showToast('✅ تم تصدير بيانات المبيعات', 'success');
-        }
-        
-        function exportDebts() {
-            const dataStr = JSON.stringify(debts, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-            const link = document.createElement('a');
-            link.setAttribute('href', dataUri);
-            link.setAttribute('download', `debts-backup-${new Date().toISOString().split('T')[0]}.json`);
-            link.click();
-            
-            showToast('✅ تم تصدير بيانات الديون', 'success');
-        }
-        
-        function clearSalesData() {
-            if (confirm('⚠️ هل تريد مسح جميع بيانات المبيعات؟ لا يمكن التراجع عن هذا الإجراء.')) {
-                transactions = [];
-                saveSalesData();
-                updateSales();
-                showToast('🗑️ تم مسح جميع بيانات المبيعات', 'success');
-            }
-        }
-        
         // === وظائف إضافية ===
         function toggleSelect(id) {
             const transaction = transactions.find(t => t.id === id);
@@ -1970,27 +1980,53 @@
         
         function filterSalesTable() {
             const search = document.getElementById('salesSearchInput').value.toLowerCase();
-            // سيتم تطبيق البحث في النسخة النهائية
+            const rows = document.querySelectorAll('#transactionsBody tr');
+            
+            rows.forEach(row => {
+                const productName = row.querySelector('.product-badge')?.textContent?.toLowerCase() || '';
+                if (productName.includes(search)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
         
         function filterDebtsTable() {
             const search = document.getElementById('debtSearchInput').value.toLowerCase();
-            // سيتم تطبيق البحث في النسخة النهائية
+            const rows = document.querySelectorAll('#debtsBody tr');
+            
+            rows.forEach(row => {
+                const debtorName = row.querySelector('.debtor-badge')?.textContent?.toLowerCase() || '';
+                if (debtorName.includes(search)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
         
         function sortSalesTable(column) {
-            salesSortColumn = column;
-            salesSortDirection = salesSortDirection === 'asc' ? 'desc' : 'asc';
+            if (salesSortColumn === column) {
+                salesSortDirection = salesSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                salesSortColumn = column;
+                salesSortDirection = 'desc';
+            }
             updateTransactionsTable();
         }
         
         function sortDebtsTable(column) {
-            debtSortColumn = column;
-            debtSortDirection = debtSortDirection === 'asc' ? 'desc' : 'asc';
+            if (debtSortColumn === column) {
+                debtSortDirection = debtSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                debtSortColumn = column;
+                debtSortDirection = 'desc';
+            }
             updateDebtsTable();
         }
         
-        console.log("🎯 النظام مع الميزات الجديدة جاهز!");
+        console.log("🎯 النظام مع جميع التحديثات جاهز!");
     </script>
 </body>
 </html>
