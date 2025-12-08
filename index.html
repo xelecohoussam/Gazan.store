@@ -1176,8 +1176,37 @@
             }
         }
         
+        // === وظائف التصحيح التلقائي ===
+        function fixOldFlexyData() {
+            let modified = false;
+            
+            transactions.forEach(transaction => {
+                if (transaction.type === 'flexy' && !transaction.corrected) {
+                    // نعيد حسابها بالطريقة الجديدة
+                    const currentRate = parseFloat(document.getElementById('exchangeRate').value) || exchangeRate;
+                    const productCost = transaction.usdPrice * currentRate;
+                    const netAmount = transaction.productPrice * 0.82;
+                    const correctProfit = netAmount - productCost;
+                    
+                    // تحديث البيانات
+                    transaction.cost = productCost;
+                    transaction.profit = correctProfit;
+                    transaction.corrected = true;
+                    modified = true;
+                    
+                    console.log(`تم تصحيح ${transaction.productName}: الربح من ${transaction.profit} إلى ${correctProfit}`);
+                }
+            });
+            
+            if (modified) {
+                saveSalesData();
+                showToast('✅ تم تصحيح بيانات الفليكسي القديمة تلقائياً', 'info');
+            }
+        }
+        
         // === وظائف المبيعات ===
         function loadData() {
+            fixOldFlexyData(); // تصحيح البيانات القديمة تلقائياً
             updateSales();
             updateDebts();
             checkForZeroDebts();
@@ -1203,14 +1232,35 @@
             }
             
             exchangeRate = rate;
-            let cost = paymentType === 'flexy' ? (usdPrice * rate) / 0.82 : usdPrice * rate;
-            let profit = productPrice - cost;
             
-            document.getElementById('profitCalculation').innerHTML = `
-                <div><i class="fas fa-money-bill-wave normal-price"></i> <span class="normal-price">التكلفة:</span> ${formatNumber(cost)} دينار</div>
-                <div><i class="fas fa-tag"></i> <span>سعر المنتج:</span> ${formatNumber(productPrice)} دينار</div>
-                <div class="profit-display"><i class="fas fa-money-bill"></i> الربح: ${formatNumber(profit)} دينار</div>
-            `;
+            if (paymentType === 'flexy') {
+                // حساب فليكسي - خطوة بخطوة كما وصفتها
+                // 1. تحويل سعر المنتج من الدولار للدينار
+                const productCost = usdPrice * rate;
+                
+                // 2. المبلغ الصافي بعد خصم فليكسي 18%
+                const netAmount = productPrice * 0.82;
+                
+                // 3. الربح النهائي
+                let profit = netAmount - productCost;
+                
+                document.getElementById('profitCalculation').innerHTML = `
+                    <div><i class="fas fa-dollar-sign normal-price"></i> <span class="normal-price">التكلفة:</span> ${formatNumber(productCost)} دينار (${usdPrice}$ × ${rate})</div>
+                    <div><i class="fas fa-credit-card flexy-price"></i> <span>بعد فليكسي:</span> ${formatNumber(productPrice)} × 0.82 = ${formatNumber(netAmount)} دينار</div>
+                    <div><i class="fas fa-tag"></i> <span>المبلغ الصافي:</span> ${formatNumber(netAmount)} دينار</div>
+                    <div class="profit-display"><i class="fas fa-money-bill"></i> الربح الفعلي: ${formatNumber(profit)} دينار</div>
+                `;
+            } else {
+                // حساب عادي - كما كان
+                let cost = usdPrice * rate;
+                let profit = productPrice - cost;
+                
+                document.getElementById('profitCalculation').innerHTML = `
+                    <div><i class="fas fa-money-bill-wave normal-price"></i> <span class="normal-price">التكلفة:</span> ${formatNumber(cost)} دينار</div>
+                    <div><i class="fas fa-tag"></i> <span>سعر المنتج:</span> ${formatNumber(productPrice)} دينار</div>
+                    <div class="profit-display"><i class="fas fa-money-bill"></i> الربح: ${formatNumber(profit)} دينار</div>
+                `;
+            }
         }
         
         function addTransaction() {
@@ -1223,8 +1273,24 @@
                 return;
             }
             
-            let cost = paymentType === 'flexy' ? (usdPrice * exchangeRate) / 0.82 : usdPrice * exchangeRate;
-            let profit = productPrice - cost;
+            let cost, profit;
+            
+            if (paymentType === 'flexy') {
+                // حساب فليكسي حسب الطريقة الجديدة والصحيحة
+                // 1. تكلفة المنتج بالدينار
+                cost = usdPrice * exchangeRate;
+                
+                // 2. المبلغ الصافي بعد خصم فليكسي 18% (ضرب في 0.82)
+                const netAmount = productPrice * 0.82;
+                
+                // 3. الربح النهائي
+                profit = netAmount - cost;
+            } else {
+                // حساب عادي
+                cost = usdPrice * exchangeRate;
+                profit = productPrice - cost;
+            }
+            
             const now = new Date();
             const timestamp = now.getTime();
             const date = formatDate(timestamp);
@@ -1240,7 +1306,8 @@
                 additionalProfits: [],
                 date: date,
                 timestamp: timestamp,
-                selected: false
+                selected: false,
+                corrected: true // تم إنشاؤها بالطريقة الصحيحة
             };
             
             // إضافة في بداية المصفوفة للحصول على الأحدث أولاً
