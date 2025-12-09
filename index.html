@@ -1176,37 +1176,9 @@
             }
         }
         
-        // === وظائف التصحيح التلقائي ===
-        function fixOldFlexyData() {
-            let modified = false;
-            
-            transactions.forEach(transaction => {
-                if (transaction.type === 'flexy' && !transaction.corrected) {
-                    // نعيد حسابها بالطريقة الجديدة
-                    const currentRate = parseFloat(document.getElementById('exchangeRate').value) || exchangeRate;
-                    const productCost = transaction.usdPrice * currentRate;
-                    const netAmount = transaction.productPrice * 0.82;
-                    const correctProfit = netAmount - productCost;
-                    
-                    // تحديث البيانات
-                    transaction.cost = productCost;
-                    transaction.profit = correctProfit;
-                    transaction.corrected = true;
-                    modified = true;
-                    
-                    console.log(`تم تصحيح ${transaction.productName}: الربح من ${transaction.profit} إلى ${correctProfit}`);
-                }
-            });
-            
-            if (modified) {
-                saveSalesData();
-                showToast('✅ تم تصحيح بيانات الفليكسي القديمة تلقائياً', 'info');
-            }
-        }
-        
         // === وظائف المبيعات ===
         function loadData() {
-            fixOldFlexyData(); // تصحيح البيانات القديمة تلقائياً
+            // ⚠️ تم إزالة التصحيح التلقائي للفليكسي هنا
             updateSales();
             updateDebts();
             checkForZeroDebts();
@@ -1306,8 +1278,7 @@
                 additionalProfits: [],
                 date: date,
                 timestamp: timestamp,
-                selected: false,
-                corrected: true // تم إنشاؤها بالطريقة الصحيحة
+                selected: false
             };
             
             // إضافة في بداية المصفوفة للحصول على الأحدث أولاً
