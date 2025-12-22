@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة المبيعات والمديونين</title>
+    <title>Gazan System - إدارة المبيعات والمديونين والاشتراكات</title>
     <style>
         * { 
             margin: 0; 
@@ -36,6 +36,8 @@
             --warning-dark: #e67e22;
             --danger: #e74c3c;
             --danger-dark: #c0392b;
+            --info: #00bcd4;
+            --info-dark: #0097a7;
             --light: #f8f9fa;
             --dark: #2c3e50;
             --gray: #95a5a6;
@@ -55,6 +57,8 @@
             --warning-dark: #f3722c;
             --danger: #f94144;
             --danger-dark: #d00000;
+            --info: #00e5ff;
+            --info-dark: #00bcd4;
             --light: #1a1a2e;
             --dark: #f8f9fa;
             --gray: #b0b0b0;
@@ -130,6 +134,7 @@
             padding: 20px;
             background: var(--light);
             border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
         }
         
         .page-btn {
@@ -155,6 +160,10 @@
             border-color: var(--primary);
         }
         
+        .page-btn.info { border-color: var(--info); }
+        .page-btn.info.active { background: var(--info); border-color: var(--info); }
+        .page-btn.info:hover { background: var(--info); border-color: var(--info); }
+        
         /* Statistics Cards */
         .stats-grid {
             display: grid;
@@ -179,6 +188,7 @@
         .stat-card.green { border-color: var(--success); }
         .stat-card.orange { border-color: var(--warning); }
         .stat-card.red { border-color: var(--danger); }
+        .stat-card.info { border-color: var(--info); }
         
         .stat-number { 
             font-size: 2.5em; 
@@ -192,6 +202,7 @@
         .green-text { color: var(--success); }
         .orange-text { color: var(--warning); }
         .red-text { color: var(--danger); }
+        .info-text { color: var(--info); }
         
         /* Page Content */
         .page-content {
@@ -214,6 +225,87 @@
             grid-template-columns: 1fr 1fr 1fr;
             gap: 15px;
             margin-bottom: 20px;
+        }
+        
+        .subscription-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .duration-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        .duration-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            background: var(--light);
+        }
+        
+        .duration-option:hover {
+            background: rgba(0, 188, 212, 0.1);
+        }
+        
+        .duration-option.selected {
+            border-color: var(--info);
+            background: rgba(0, 188, 212, 0.1);
+        }
+        
+        .duration-radio {
+            display: none;
+        }
+        
+        .duration-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .radio-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .duration-radio:checked + .duration-label .radio-custom {
+            border-color: var(--info);
+            background: var(--info);
+        }
+        
+        .duration-radio:checked + .duration-label .radio-custom::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        .duration-icon {
+            font-size: 1.2em;
+            color: var(--info);
         }
         
         .payment-options {
@@ -262,17 +354,6 @@
             gap: 8px;
             font-weight: bold;
             cursor: pointer;
-        }
-        
-        .radio-custom {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
         }
         
         .payment-radio:checked + .payment-label .radio-custom {
@@ -347,8 +428,24 @@
             justify-content: center;
         }
         
+        .subscription-dates {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
         .flexy-price { color: var(--secondary); font-weight: bold; }
         .normal-price { color: var(--primary); font-weight: bold; }
+        .info-price { color: var(--info); font-weight: bold; }
         .profit-display { color: var(--success); font-weight: bold; font-size: 1.2em; }
         
         /* Transactions Section */
@@ -371,38 +468,40 @@
             min-width: 250px;
         }
         
-        .transaction-table-wrapper, .debts-table-wrapper {
+        .transaction-table-wrapper, .debts-table-wrapper, .subscriptions-table-wrapper {
             overflow-x: auto;
             border-radius: 10px;
             border: 1px solid var(--border);
         }
         
-        .transaction-table, .debts-table {
+        .transaction-table, .debts-table, .subscriptions-table {
             width: 100%;
             border-collapse: collapse;
             min-width: 800px;
         }
         
         .transaction-table th, .transaction-table td,
-        .debts-table th, .debts-table td {
+        .debts-table th, .debts-table td,
+        .subscriptions-table th, .subscriptions-table td {
             padding: 16px;
             text-align: center;
             border-bottom: 1px solid var(--border);
         }
         
-        .transaction-table th, .debts-table th {
+        .transaction-table th, .debts-table th, .subscriptions-table th {
             background: var(--dark);
             color: var(--light);
             position: relative;
             cursor: pointer;
         }
         
-        .transaction-table th:hover, .debts-table th:hover {
+        .transaction-table th:hover, .debts-table th:hover, .subscriptions-table th:hover {
             background: #34495e;
         }
         
         .normal { border-left: 4px solid var(--primary); }
         .flexy { border-left: 4px solid var(--secondary); }
+        .subscription-row { border-left: 4px solid var(--info); }
         
         .type-badge {
             padding: 6px 15px;
@@ -414,6 +513,33 @@
         
         .type-normal { background: var(--primary); }
         .type-flexy { background: var(--secondary); }
+        .type-subscription { background: var(--info); }
+        
+        .duration-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .duration-1 { background: linear-gradient(45deg, var(--info), #2196f3); color: white; }
+        .duration-2 { background: linear-gradient(45deg, var(--info), #00bcd4); color: white; }
+        .duration-3 { background: linear-gradient(45deg, var(--info), #0097a7); color: white; }
+        .duration-6 { background: linear-gradient(45deg, var(--info), #006064); color: white; }
+        .duration-12 { background: linear-gradient(45deg, var(--info), #004d40); color: white; }
+        
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .status-active { background: linear-gradient(45deg, var(--success), var(--success-dark)); color: white; }
+        .status-expired { background: linear-gradient(45deg, var(--danger), var(--danger-dark)); color: white; }
+        .status-soon { background: linear-gradient(45deg, var(--warning), var(--warning-dark)); color: white; }
         
         .product-badge {
             padding: 4px 10px;
@@ -423,6 +549,18 @@
             display: inline-block;
             margin: 2px;
             background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            cursor: pointer;
+        }
+        
+        .subscription-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 2px;
+            background: linear-gradient(45deg, var(--info), var(--info-dark));
             color: white;
             cursor: pointer;
         }
@@ -462,10 +600,20 @@
             background: rgba(231, 76, 60, 0.1);
         }
         
+        .date-cell {
+            cursor: pointer;
+            font-family: monospace;
+        }
+        
+        .date-cell:hover {
+            background: rgba(155, 89, 182, 0.1);
+        }
+        
         .action-buttons {
             display: flex;
             gap: 5px;
             justify-content: center;
+            flex-wrap: wrap;
         }
         
         .action-btn {
@@ -512,6 +660,14 @@
             background: var(--warning-dark);
         }
         
+        .renew-btn {
+            background: var(--success);
+        }
+        
+        .renew-btn:hover {
+            background: var(--success-dark);
+        }
+        
         .profit-btn {
             background: var(--success);
         }
@@ -520,13 +676,12 @@
             background: var(--success-dark);
         }
         
-        .date-cell {
-            cursor: pointer;
-            font-family: monospace;
+        .info-btn {
+            background: var(--info);
         }
         
-        .date-cell:hover {
-            background: rgba(155, 89, 182, 0.1);
+        .info-btn:hover {
+            background: var(--info-dark);
         }
         
         /* More Button Styles */
@@ -709,12 +864,12 @@
         }
         
         @media (max-width: 768px) {
-            .product-form { grid-template-columns: 1fr; }
+            .product-form, .subscription-form { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .header h1 { font-size: 1.8em; }
             .stat-number { font-size: 2em; }
-            .payment-options { flex-direction: column; }
-            .transaction-table, .debts-table { min-width: 600px; }
+            .payment-options, .duration-options { flex-direction: column; }
+            .transaction-table, .debts-table, .subscriptions-table { min-width: 600px; }
             .action-buttons { flex-direction: column; }
             .more-btn { padding: 10px 15px; }
             .more-options { min-width: 180px; }
@@ -777,6 +932,14 @@
             background: var(--success-dark);
         }
         
+        .info-btn {
+            background: var(--info);
+        }
+        
+        .info-btn:hover {
+            background: var(--info-dark);
+        }
+        
         /* Quick Profit Menu */
         .profit-menu {
             position: absolute;
@@ -822,8 +985,98 @@
             margin-bottom: 20px;
         }
         
+        /* Subscriptions Page Specific */
+        .subscriptions-controls {
+            padding: 30px;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+        }
+        
         @media (max-width: 768px) {
             .debt-form { grid-template-columns: 1fr; }
+        }
+        
+        /* Date Picker */
+        .date-input {
+            font-family: monospace;
+        }
+        
+        /* New Edit Modals */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .edit-modal-content {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .edit-modal-title {
+            margin-bottom: 20px;
+            color: var(--dark);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .edit-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .edit-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .edit-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .edit-form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--light);
+            color: var(--dark);
+            font-size: 16px;
+        }
+        
+        .edit-form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .date-edit-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .date-edit-container input {
+            flex: 1;
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -837,14 +1090,15 @@
             <button class="theme-toggle" onclick="toggleTheme()">
                 <i class="fas fa-moon"></i>
             </button>
-            <h1><i class="fas fa-rocket"></i> نظام إدارة المبيعات والمديونين</h1>
-            <p>إحصائيات حية وتقارير مفصلة</p>
+            <h1><i class="fas fa-rocket"></i> Gazan System</h1>
+            <p>إدارة المبيعات والمديونين والاشتراكات</p>
         </div>
         
         <!-- Page Navigation -->
         <div class="page-nav">
             <button class="page-btn active" onclick="showPage('sales')">المبيعات</button>
             <button class="page-btn" onclick="showPage('debts')">المديونين</button>
+            <button class="page-btn info" onclick="showPage('subscriptions')">الاشتراكات</button>
         </div>
         
         <!-- Sales Page -->
@@ -1065,6 +1319,154 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Subscriptions Page -->
+        <div id="subscriptions-page" class="page-content">
+            <!-- Subscriptions Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card info">
+                    <h3><i class="fas fa-users"></i> إجمالي المشتركين</h3>
+                    <div class="stat-number info-text" id="totalSubscribers">0 مشترك</div>
+                    <p id="activeSubscriptions">0 اشتراك نشط</p>
+                </div>
+                <div class="stat-card blue">
+                    <h3><i class="fas fa-calendar-check"></i> الاشتراكات النشطة</h3>
+                    <div class="stat-number blue-text" id="activeSubsCount">0 اشتراك</div>
+                    <p>اشتراكات لم تنتهي صلاحيتها</p>
+                </div>
+                <div class="stat-card orange">
+                    <h3><i class="fas fa-exclamation-triangle"></i> تنتهي قريباً</h3>
+                    <div class="stat-number orange-text" id="expiringSoonCount">0 اشتراك</div>
+                    <p>تنتهي خلال 7 أيام</p>
+                </div>
+                <div class="stat-card red">
+                    <h3><i class="fas fa-calendar-times"></i> الاشتراكات المنتهية</h3>
+                    <div class="stat-number red-text" id="expiredSubsCount">0 اشتراك</div>
+                    <p>انتهت صلاحيتها</p>
+                </div>
+            </div>
+            
+            <!-- Add Subscription -->
+            <div class="subscriptions-controls">
+                <h3><i class="fas fa-user-plus"></i> إضافة اشتراك جديد</h3>
+                
+                <div class="subscription-form">
+                    <input type="text" id="subscriptionName" placeholder="اسم الاشتراك (مثال: نتفلكس، سبوتيفاي)" style="width: 100%;">
+                    <input type="text" id="subscriberName" placeholder="اسم المشترك" style="width: 100%;">
+                </div>
+                
+                <!-- Duration Options -->
+                <div class="duration-options">
+                    <div class="duration-option selected" onclick="selectDuration(1)" id="duration1Option">
+                        <input type="radio" name="duration" value="1" id="duration1" class="duration-radio" checked>
+                        <label for="duration1" class="duration-label">
+                            <span class="radio-custom"></span>
+                            <i class="fas fa-calendar-day duration-icon"></i>
+                            <span>شهر واحد</span>
+                        </label>
+                    </div>
+                    
+                    <div class="duration-option" onclick="selectDuration(2)" id="duration2Option">
+                        <input type="radio" name="duration" value="2" id="duration2" class="duration-radio">
+                        <label for="duration2" class="duration-label">
+                            <span class="radio-custom"></span>
+                            <i class="fas fa-calendar-alt duration-icon"></i>
+                            <span>شهرين</span>
+                        </label>
+                    </div>
+                    
+                    <div class="duration-option" onclick="selectDuration(3)" id="duration3Option">
+                        <input type="radio" name="duration" value="3" id="duration3" class="duration-radio">
+                        <label for="duration3" class="duration-label">
+                            <span class="radio-custom"></span>
+                            <i class="fas fa-calendar duration-icon"></i>
+                            <span>3 أشهر</span>
+                        </label>
+                    </div>
+                    
+                    <div class="duration-option" onclick="selectDuration(6)" id="duration6Option">
+                        <input type="radio" name="duration" value="6" id="duration6" class="duration-radio">
+                        <label for="duration6" class="duration-label">
+                            <span class="radio-custom"></span>
+                            <i class="fas fa-calendar-check duration-icon"></i>
+                            <span>6 أشهر</span>
+                        </label>
+                    </div>
+                    
+                    <div class="duration-option" onclick="selectDuration(12)" id="duration12Option">
+                        <input type="radio" name="duration" value="12" id="duration12" class="duration-radio">
+                        <label for="duration12" class="duration-label">
+                            <span class="radio-custom"></span>
+                            <i class="fas fa-calendar-star duration-icon"></i>
+                            <span>سنة كاملة</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Add Button -->
+                <div class="add-btn-container">
+                    <button class="add-btn" onclick="addSubscription()" style="background: var(--info);">
+                        <i class="fas fa-plus-circle"></i>
+                        إضافة الاشتراك
+                    </button>
+                </div>
+                
+                <!-- Dates Display -->
+                <div class="subscription-dates" id="subscriptionDatesDisplay">
+                    <div style="color: var(--gray);">
+                        <i class="fas fa-arrow-left"></i> أدخل بيانات الاشتراك لرؤية تواريخ البدء والانتهاء
+                    </div>
+                </div>
+                
+                <!-- Subscriptions Action Buttons -->
+                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <button class="clear-btn" onclick="clearAllSubscriptions()">
+                        <i class="fas fa-trash"></i> مسح جميع الاشتراكات
+                    </button>
+                    
+                    <div class="more-btn-container">
+                        <button class="more-btn info-btn" onclick="toggleMoreOptions('subscriptions')">
+                            <i class="fas fa-ellipsis-h"></i> المزيد
+                        </button>
+                        <div class="more-options" id="subscriptionsMoreOptions">
+                            <button class="option-btn export" onclick="exportSubscriptions()">
+                                <i class="fas fa-file-export"></i> تصدير الاشتراكات
+                            </button>
+                            <button class="option-btn import" onclick="importSubscriptions()">
+                                <i class="fas fa-file-import"></i> استيراد الاشتراكات
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Subscriptions Table -->
+            <div class="transactions">
+                <div class="table-controls">
+                    <div class="search-box">
+                        <input type="text" id="subscriptionSearchInput" placeholder="ابحث في الاشتراكات..." style="width: 100%;" oninput="filterSubscriptionsTable()">
+                    </div>
+                </div>
+                
+                <div class="subscriptions-table-wrapper">
+                    <table class="subscriptions-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th onclick="sortSubscriptionsTable('subscriptionName')">اسم الاشتراك</th>
+                                <th onclick="sortSubscriptionsTable('subscriberName')">اسم المشترك</th>
+                                <th onclick="sortSubscriptionsTable('duration')">المدة</th>
+                                <th onclick="sortSubscriptionsTable('startDate')">تاريخ البدء</th>
+                                <th onclick="sortSubscriptionsTable('endDate')">تاريخ الانتهاء</th>
+                                <th onclick="sortSubscriptionsTable('status')">الحالة</th>
+                                <th style="width: 250px;">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscriptionsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Toast Container -->
@@ -1117,22 +1519,127 @@
             </div>
         </div>
     </div>
+    
+    <div class="modal" id="renewSubscriptionModal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-redo"></i> تجديد الاشتراك</h3>
+            <div id="renewSubscriptionModalContent"></div>
+            <div class="modal-actions">
+                <button onclick="saveRenewal()" class="export-btn"><i class="fas fa-check"></i> تجديد</button>
+                <button onclick="closeRenewSubscriptionModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Edit Modals -->
+    <div class="edit-modal" id="editProductModal">
+        <div class="edit-modal-content">
+            <h3 class="edit-modal-title"><i class="fas fa-edit"></i> تعديل اسم المنتج</h3>
+            <div class="edit-form-group">
+                <label>اسم المنتج الجديد:</label>
+                <input type="text" id="editProductNameInput" placeholder="أدخل الاسم الجديد">
+            </div>
+            <div class="edit-modal-actions">
+                <button onclick="saveEditProduct()" class="export-btn"><i class="fas fa-check"></i> حفظ</button>
+                <button onclick="closeEditProductModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="edit-modal" id="editDebtorModal">
+        <div class="edit-modal-content">
+            <h3 class="edit-modal-title"><i class="fas fa-user-edit"></i> تعديل اسم المديون</h3>
+            <div class="edit-form-group">
+                <label>اسم المديون الجديد:</label>
+                <input type="text" id="editDebtorNameInput" placeholder="أدخل الاسم الجديد">
+            </div>
+            <div class="edit-modal-actions">
+                <button onclick="saveEditDebtor()" class="export-btn"><i class="fas fa-check"></i> حفظ</button>
+                <button onclick="closeEditDebtorModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="edit-modal" id="editSubscriptionModal">
+        <div class="edit-modal-content">
+            <h3 class="edit-modal-title"><i class="fas fa-edit"></i> تعديل اسم الاشتراك</h3>
+            <div class="edit-form-group">
+                <label>اسم الاشتراك الجديد:</label>
+                <input type="text" id="editSubscriptionNameInput" placeholder="أدخل الاسم الجديد">
+            </div>
+            <div class="edit-modal-actions">
+                <button onclick="saveEditSubscription()" class="export-btn"><i class="fas fa-check"></i> حفظ</button>
+                <button onclick="closeEditSubscriptionModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="edit-modal" id="editSubscriberModal">
+        <div class="edit-modal-content">
+            <h3 class="edit-modal-title"><i class="fas fa-user-edit"></i> تعديل اسم المشترك</h3>
+            <div class="edit-form-group">
+                <label>اسم المشترك الجديد:</label>
+                <input type="text" id="editSubscriberNameInput" placeholder="أدخل الاسم الجديد">
+            </div>
+            <div class="edit-modal-actions">
+                <button onclick="saveEditSubscriber()" class="export-btn"><i class="fas fa-check"></i> حفظ</button>
+                <button onclick="closeEditSubscriberModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="edit-modal" id="editSubscriptionDatesModal">
+        <div class="edit-modal-content">
+            <h3 class="edit-modal-title"><i class="fas fa-calendar-edit"></i> تعديل تواريخ الاشتراك</h3>
+            <div class="edit-form-group">
+                <label>تاريخ البدء (YYYY/MM/DD):</label>
+                <input type="text" id="editStartDateInput" placeholder="مثال: 2024/01/15" class="date-input">
+            </div>
+            <div class="edit-form-group">
+                <label>المدة:</label>
+                <select id="editDurationInput" style="width: 100%;">
+                    <option value="1">شهر واحد</option>
+                    <option value="2">شهرين</option>
+                    <option value="3">3 أشهر</option>
+                    <option value="6">6 أشهر</option>
+                    <option value="12">سنة كاملة</option>
+                </select>
+            </div>
+            <div id="newEndDateDisplay" style="margin: 15px 0; padding: 10px; background: var(--border); border-radius: 8px; text-align: center;">
+                <strong>تاريخ الانتهاء: <span id="calculatedEndDate">-</span></strong>
+            </div>
+            <div class="edit-modal-actions">
+                <button onclick="saveEditSubscriptionDates()" class="export-btn"><i class="fas fa-check"></i> حفظ</button>
+                <button onclick="closeEditSubscriptionDatesModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        console.log("🚀 بدء النظام...");
+        console.log("🚀 بدء Gazan System...");
         
         // البيانات الرئيسية
         let exchangeRate = 255;
         let currentProfitId = null;
         let currentDebtorId = null;
         let currentTransactionId = null;
+        let currentSubscriptionId = null;
         let profitMenuOpen = false;
         let paymentType = 'normal';
+        let subscriptionDuration = 1;
         let paidDebtsCount = 0;
+        
+        // متغيرات للتعديل
+        let editingProductId = null;
+        let editingDebtorId = null;
+        let editingSubscriptionId = null;
+        let editingSubscriberId = null;
+        let editingSubscriptionDatesId = null;
         
         // تخزين البيانات
         let transactions = JSON.parse(localStorage.getItem('salesTransactions')) || [];
         let debts = JSON.parse(localStorage.getItem('debtsData')) || [];
+        let subscriptions = JSON.parse(localStorage.getItem('subscriptionsData')) || [];
         
         // إعدادات العرض
         let currentPage = 'sales';
@@ -1140,9 +1647,11 @@
         let salesSortDirection = 'desc';
         let debtSortColumn = 'timestamp';
         let debtSortDirection = 'desc';
+        let subscriptionSortColumn = 'timestamp';
+        let subscriptionSortDirection = 'desc';
         
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("✅ النظام جاهز");
+            console.log("✅ Gazan System جاهز");
             loadThemePreference();
             loadData();
             showPage('sales');
@@ -1155,8 +1664,18 @@
                 if (!e.target.closest('.more-btn-container')) {
                     document.getElementById('salesMoreOptions').classList.remove('show');
                     document.getElementById('debtsMoreOptions').classList.remove('show');
+                    document.getElementById('subscriptionsMoreOptions').classList.remove('show');
                 }
             });
+            
+            // تحديث عرض تواريخ الاشتراك عند تغيير المدة
+            document.querySelectorAll('.duration-option').forEach(option => {
+                option.addEventListener('click', updateSubscriptionDates);
+            });
+            
+            // تحديث تاريخ الانتهاء عند تعديل التواريخ
+            document.getElementById('editStartDateInput').addEventListener('input', updateCalculatedEndDate);
+            document.getElementById('editDurationInput').addEventListener('change', updateCalculatedEndDate);
         });
         
         // === وظائف التنقل ===
@@ -1173,14 +1692,16 @@
                 updateSales();
             } else if (page === 'debts') {
                 updateDebts();
+            } else if (page === 'subscriptions') {
+                updateSubscriptions();
             }
         }
         
         // === وظائف المبيعات ===
         function loadData() {
-            // ⚠️ تم إزالة التصحيح التلقائي للفليكسي هنا
             updateSales();
             updateDebts();
+            updateSubscriptions();
             checkForZeroDebts();
         }
         
@@ -1199,7 +1720,7 @@
             
             if (!usdPrice || !productPrice) {
                 document.getElementById('profitCalculation').innerHTML = 
-                    '<div style="color: var(--gray);"><i class="fas fa-arrow-left"></i> أدخل جميع الأسعار لرؤية حساب الربح</div>';
+                    '<div style="color: var(--gray);"><i class="fas fa-arrow-left"></i> أدخل الأسعار لرؤية حساب الربح</div>';
                 return;
             }
             
@@ -1385,7 +1906,7 @@
                     <tr class="${t.type === 'normal' ? 'normal' : 'flexy'} ${t.selected ? 'selected' : ''}">
                         <td><input type="checkbox" class="select-checkbox" ${t.selected ? 'checked' : ''} onchange="toggleSelect(${t.id})"></td>
                         <td>
-                            <span class="product-badge" onclick="editProduct(${t.id})">
+                            <span class="product-badge" onclick="openEditProductModal(${t.id})">
                                 ${t.productName}
                                 ${hasAdditional ? ` <small>(+${t.additionalProfits.length})</small>` : ''}
                             </span>
@@ -1401,7 +1922,7 @@
                         <td class="date-cell">${t.date}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="action-btn edit-btn" onclick="editProduct(${t.id})" title="تعديل المنتج">
+                                <button class="action-btn edit-btn" onclick="openEditProductModal(${t.id})" title="تعديل المنتج">
                                     <i class="fas fa-edit"></i> تعديل
                                 </button>
                                 <button class="action-btn profit-btn" onclick="addNewProfit(${t.id})" title="إضافة ربح">
@@ -1488,19 +2009,35 @@
             currentTransactionId = null;
         }
         
-        // === وظائف تعديل المنتج ===
-        function editProduct(id) {
+        // === وظائف تعديل المنتج (النافذة الجديدة) ===
+        function openEditProductModal(id) {
+            editingProductId = id;
             const transaction = transactions.find(t => t.id === id);
-            if (!transaction) return;
             
-            // استخدام نافذة prompt البسيطة للتعديل
-            const newName = prompt('تعديل اسم المنتج:', transaction.productName);
-            if (newName !== null && newName.trim() !== '') {
-                transaction.productName = newName.trim();
+            if (transaction) {
+                document.getElementById('editProductNameInput').value = transaction.productName;
+                document.getElementById('editProductModal').style.display = 'flex';
+                document.getElementById('editProductNameInput').focus();
+            }
+        }
+        
+        function saveEditProduct() {
+            const newName = document.getElementById('editProductNameInput').value.trim();
+            if (!newName || !editingProductId) return;
+            
+            const transaction = transactions.find(t => t.id === editingProductId);
+            if (transaction) {
+                transaction.productName = newName;
                 saveSalesData();
                 updateSales();
+                closeEditProductModal();
                 showToast('✅ تم تحديث اسم المنتج', 'success');
             }
+        }
+        
+        function closeEditProductModal() {
+            document.getElementById('editProductModal').style.display = 'none';
+            editingProductId = null;
         }
         
         function deleteTransaction(id) {
@@ -1594,16 +2131,20 @@
         function toggleMoreOptions(type) {
             const salesOptions = document.getElementById('salesMoreOptions');
             const debtsOptions = document.getElementById('debtsMoreOptions');
+            const subscriptionsOptions = document.getElementById('subscriptionsMoreOptions');
             
             // إغلاق جميع القوائم أولاً
             salesOptions.classList.remove('show');
             debtsOptions.classList.remove('show');
+            subscriptionsOptions.classList.remove('show');
             
             // فتح القائمة المطلوبة
             if (type === 'sales') {
                 salesOptions.classList.toggle('show');
             } else if (type === 'debts') {
                 debtsOptions.classList.toggle('show');
+            } else if (type === 'subscriptions') {
+                subscriptionsOptions.classList.toggle('show');
             }
         }
         
@@ -1613,7 +2154,7 @@
             const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
             const link = document.createElement('a');
             link.setAttribute('href', dataUri);
-            link.setAttribute('download', `sales-backup-${formatDate(Date.now()).replace(/\//g, '-')}.json`);
+            link.setAttribute('download', `GazanSystem-sales-${formatDate(Date.now()).replace(/\//g, '-')}.json`);
             link.click();
             
             showToast('✅ تم تصدير بيانات المبيعات', 'success');
@@ -1659,7 +2200,7 @@
             const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
             const link = document.createElement('a');
             link.setAttribute('href', dataUri);
-            link.setAttribute('download', `debts-backup-${formatDate(Date.now()).replace(/\//g, '-')}.json`);
+            link.setAttribute('download', `GazanSystem-debts-${formatDate(Date.now()).replace(/\//g, '-')}.json`);
             link.click();
             
             showToast('✅ تم تصدير بيانات الديون', 'success');
@@ -1779,7 +2320,7 @@
                     <tr>
                         <td>${index + 1}</td>
                         <td>
-                            <span class="debtor-badge ${badgeClass}" onclick="editDebtor(${d.id})">
+                            <span class="debtor-badge ${badgeClass}" onclick="openEditDebtorModal(${d.id})">
                                 ${d.name}
                                 ${isPaid ? ' (مسدد)' : ''}
                             </span>
@@ -1790,7 +2331,7 @@
                         <td class="date-cell">${d.date}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="action-btn edit-btn" onclick="editDebtor(${d.id})" title="تعديل الاسم">
+                                <button class="action-btn edit-btn" onclick="openEditDebtorModal(${d.id})" title="تعديل الاسم">
                                     <i class="fas fa-edit"></i> تعديل
                                 </button>
                                 <button class="action-btn update-btn" onclick="updateDebtAmount(${d.id})" title="تحديث المبلغ">
@@ -1805,6 +2346,37 @@
                 `;
                 tbody.innerHTML += row;
             });
+        }
+        
+        // === وظائف تعديل المديونين (النافذة الجديدة) ===
+        function openEditDebtorModal(id) {
+            editingDebtorId = id;
+            const debtor = debts.find(d => d.id === id);
+            
+            if (debtor) {
+                document.getElementById('editDebtorNameInput').value = debtor.name;
+                document.getElementById('editDebtorModal').style.display = 'flex';
+                document.getElementById('editDebtorNameInput').focus();
+            }
+        }
+        
+        function saveEditDebtor() {
+            const newName = document.getElementById('editDebtorNameInput').value.trim();
+            if (!newName || !editingDebtorId) return;
+            
+            const debtor = debts.find(d => d.id === editingDebtorId);
+            if (debtor) {
+                debtor.name = newName;
+                saveDebtsData();
+                updateDebts();
+                closeEditDebtorModal();
+                showToast('✅ تم تحديث اسم المديون', 'success');
+            }
+        }
+        
+        function closeEditDebtorModal() {
+            document.getElementById('editDebtorModal').style.display = 'none';
+            editingDebtorId = null;
         }
         
         // === خاصية الحذف التلقائي عند وصول الدين للصفر ===
@@ -1830,19 +2402,6 @@
                         showToast(`✅ تم حذف ${deletedCount} دين وصل مبلغه للصفر`, 'success');
                     }
                 }, 500);
-            }
-        }
-        
-        function editDebtor(id) {
-            const debtor = debts.find(d => d.id === id);
-            if (!debtor) return;
-            
-            const newName = prompt('تعديل اسم المديون:', debtor.name);
-            if (newName !== null && newName.trim() !== '') {
-                debtor.name = newName.trim();
-                saveDebtsData();
-                updateDebts();
-                showToast('✅ تم تحديث اسم المديون', 'success');
             }
         }
         
@@ -1934,6 +2493,520 @@
             }
         }
         
+        // === وظائف الاشتراكات ===
+        function selectDuration(duration) {
+            subscriptionDuration = duration;
+            document.querySelectorAll('.duration-option').forEach(o => o.classList.remove('selected'));
+            document.getElementById('duration' + duration + 'Option').classList.add('selected');
+            document.getElementById('duration' + duration).checked = true;
+            updateSubscriptionDates();
+        }
+        
+        function updateSubscriptionDates() {
+            const now = new Date();
+            const startDate = formatDate(now.getTime());
+            
+            const endDate = new Date(now);
+            endDate.setMonth(endDate.getMonth() + subscriptionDuration);
+            const endDateFormatted = formatDate(endDate.getTime());
+            
+            document.getElementById('subscriptionDatesDisplay').innerHTML = `
+                <div class="info-price">
+                    <i class="fas fa-calendar-day"></i> تاريخ البدء: ${startDate}
+                </div>
+                <div class="info-price">
+                    <i class="fas fa-calendar-times"></i> تاريخ الانتهاء: ${endDateFormatted}
+                </div>
+                <div style="margin-top: 10px; color: var(--gray); font-size: 14px;">
+                    المدة: ${getDurationText(subscriptionDuration)}
+                </div>
+            `;
+        }
+        
+        function getDurationText(duration) {
+            switch(duration) {
+                case 1: return 'شهر واحد';
+                case 2: return 'شهرين';
+                case 3: return '3 أشهر';
+                case 6: return '6 أشهر';
+                case 12: return 'سنة كاملة';
+                default: return `${duration} شهر`;
+            }
+        }
+        
+        function addSubscription() {
+            const subscriptionName = document.getElementById('subscriptionName').value.trim();
+            const subscriberName = document.getElementById('subscriberName').value.trim();
+            
+            if (!subscriptionName || !subscriberName) {
+                showToast('⚠️ أدخل جميع بيانات الاشتراك', 'error');
+                return;
+            }
+            
+            const now = new Date();
+            const startDate = new Date();
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + subscriptionDuration);
+            
+            const timestamp = now.getTime();
+            const subscription = {
+                id: timestamp,
+                subscriptionName: subscriptionName,
+                subscriberName: subscriberName,
+                duration: subscriptionDuration,
+                durationText: getDurationText(subscriptionDuration),
+                startDate: formatDate(startDate.getTime()),
+                endDate: formatDate(endDate.getTime()),
+                startTimestamp: startDate.getTime(),
+                endTimestamp: endDate.getTime(),
+                date: formatDate(timestamp),
+                timestamp: timestamp,
+                status: 'active'
+            };
+            
+            // تحديث حالة الاشتراك بناءً على تاريخ الانتهاء
+            updateSubscriptionStatus(subscription);
+            
+            // إضافة في بداية المصفوفة للحصول على الأحدث أولاً
+            subscriptions.unshift(subscription);
+            saveSubscriptionsData();
+            updateSubscriptions();
+            
+            // مسح الحقول
+            document.getElementById('subscriptionName').value = '';
+            document.getElementById('subscriberName').value = '';
+            
+            showToast(`✅ تم إضافة اشتراك ${subscriptionName} للمشترك ${subscriberName}`, 'success');
+        }
+        
+        function updateSubscriptionStatus(subscription) {
+            const now = new Date();
+            const endDate = new Date(subscription.endTimestamp);
+            const daysRemaining = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+            
+            if (daysRemaining < 0) {
+                subscription.status = 'expired';
+            } else if (daysRemaining <= 7) {
+                subscription.status = 'soon';
+            } else {
+                subscription.status = 'active';
+            }
+        }
+        
+        function updateSubscriptions() {
+            updateSubscriptionsStatistics();
+            updateSubscriptionsTable();
+        }
+        
+        function updateSubscriptionsStatistics() {
+            const now = new Date();
+            let stats = {
+                totalSubscribers: 0,
+                activeSubscriptions: 0,
+                expiringSoon: 0,
+                expiredSubscriptions: 0,
+                activeSubsCount: 0
+            };
+            
+            subscriptions.forEach(sub => {
+                updateSubscriptionStatus(sub);
+                
+                stats.totalSubscribers++;
+                
+                if (sub.status === 'active') {
+                    stats.activeSubscriptions++;
+                    stats.activeSubsCount++;
+                } else if (sub.status === 'soon') {
+                    stats.expiringSoon++;
+                    stats.activeSubsCount++; // يعتبر نشط لأنه لم ينته بعد
+                } else if (sub.status === 'expired') {
+                    stats.expiredSubscriptions++;
+                }
+            });
+            
+            // تحديث الإحصائيات
+            document.getElementById('totalSubscribers').textContent = stats.totalSubscribers + ' مشترك';
+            document.getElementById('activeSubscriptions').textContent = stats.activeSubscriptions + ' اشتراك نشط';
+            document.getElementById('activeSubsCount').textContent = stats.activeSubsCount + ' اشتراك';
+            document.getElementById('expiringSoonCount').textContent = stats.expiringSoon + ' اشتراك';
+            document.getElementById('expiredSubsCount').textContent = stats.expiredSubscriptions + ' اشتراك';
+        }
+        
+        function updateSubscriptionsTable() {
+            const tbody = document.getElementById('subscriptionsBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            // ترتيب الاشتراكات من الأحدث إلى الأقدم
+            const sortedSubscriptions = [...subscriptions].sort((a, b) => {
+                if (subscriptionSortColumn === 'timestamp') {
+                    return subscriptionSortDirection === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
+                } else if (subscriptionSortColumn === 'subscriptionName') {
+                    return subscriptionSortDirection === 'asc' 
+                        ? a.subscriptionName.localeCompare(b.subscriptionName)
+                        : b.subscriptionName.localeCompare(a.subscriptionName);
+                } else if (subscriptionSortColumn === 'subscriberName') {
+                    return subscriptionSortDirection === 'asc' 
+                        ? a.subscriberName.localeCompare(b.subscriberName)
+                        : b.subscriberName.localeCompare(a.subscriberName);
+                } else if (subscriptionSortColumn === 'endDate') {
+                    return subscriptionSortDirection === 'asc' ? a.endTimestamp - b.endTimestamp : b.endTimestamp - a.endTimestamp;
+                } else if (subscriptionSortColumn === 'status') {
+                    const statusOrder = { 'active': 1, 'soon': 2, 'expired': 3 };
+                    return subscriptionSortDirection === 'asc' 
+                        ? statusOrder[a.status] - statusOrder[b.status]
+                        : statusOrder[b.status] - statusOrder[a.status];
+                }
+                return 0;
+            });
+            
+            sortedSubscriptions.forEach((sub, index) => {
+                const statusText = sub.status === 'active' ? 'نشط' : sub.status === 'soon' ? 'قريب الانتهاء' : 'منتهي';
+                const statusClass = sub.status === 'active' ? 'status-active' : sub.status === 'soon' ? 'status-soon' : 'status-expired';
+                const durationClass = 'duration-' + sub.duration;
+                
+                const row = `
+                    <tr class="subscription-row">
+                        <td>${index + 1}</td>
+                        <td>
+                            <span class="subscription-badge" onclick="openEditSubscriptionModal(${sub.id})">
+                                ${sub.subscriptionName}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="debtor-badge" onclick="openEditSubscriberModal(${sub.id})">
+                                ${sub.subscriberName}
+                            </span>
+                        </td>
+                        <td><span class="duration-badge ${durationClass}">${sub.durationText}</span></td>
+                        <td class="date-cell" onclick="openEditSubscriptionDatesModal(${sub.id})">${sub.startDate}</td>
+                        <td class="date-cell" onclick="openEditSubscriptionDatesModal(${sub.id})">${sub.endDate}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn edit-btn" onclick="openEditSubscriptionModal(${sub.id})" title="تعديل الاشتراك">
+                                    <i class="fas fa-edit"></i> تعديل
+                                </button>
+                                <button class="action-btn renew-btn" onclick="renewSubscription(${sub.id})" title="تجديد الاشتراك">
+                                    <i class="fas fa-redo"></i> تجديد
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteSubscription(${sub.id})" title="حذف الاشتراك">
+                                    <i class="fas fa-trash"></i> حذف
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+        
+        // === وظائف تعديل الاشتراكات (النوافذ الجديدة) ===
+        function openEditSubscriptionModal(id) {
+            editingSubscriptionId = id;
+            const subscription = subscriptions.find(s => s.id === id);
+            
+            if (subscription) {
+                document.getElementById('editSubscriptionNameInput').value = subscription.subscriptionName;
+                document.getElementById('editSubscriptionModal').style.display = 'flex';
+                document.getElementById('editSubscriptionNameInput').focus();
+            }
+        }
+        
+        function saveEditSubscription() {
+            const newName = document.getElementById('editSubscriptionNameInput').value.trim();
+            if (!newName || !editingSubscriptionId) return;
+            
+            const subscription = subscriptions.find(s => s.id === editingSubscriptionId);
+            if (subscription) {
+                subscription.subscriptionName = newName;
+                saveSubscriptionsData();
+                updateSubscriptions();
+                closeEditSubscriptionModal();
+                showToast('✅ تم تحديث اسم الاشتراك', 'success');
+            }
+        }
+        
+        function closeEditSubscriptionModal() {
+            document.getElementById('editSubscriptionModal').style.display = 'none';
+            editingSubscriptionId = null;
+        }
+        
+        function openEditSubscriberModal(id) {
+            editingSubscriberId = id;
+            const subscription = subscriptions.find(s => s.id === id);
+            
+            if (subscription) {
+                document.getElementById('editSubscriberNameInput').value = subscription.subscriberName;
+                document.getElementById('editSubscriberModal').style.display = 'flex';
+                document.getElementById('editSubscriberNameInput').focus();
+            }
+        }
+        
+        function saveEditSubscriber() {
+            const newName = document.getElementById('editSubscriberNameInput').value.trim();
+            if (!newName || !editingSubscriberId) return;
+            
+            const subscription = subscriptions.find(s => s.id === editingSubscriberId);
+            if (subscription) {
+                subscription.subscriberName = newName;
+                saveSubscriptionsData();
+                updateSubscriptions();
+                closeEditSubscriberModal();
+                showToast('✅ تم تحديث اسم المشترك', 'success');
+            }
+        }
+        
+        function closeEditSubscriberModal() {
+            document.getElementById('editSubscriberModal').style.display = 'none';
+            editingSubscriberId = null;
+        }
+        
+        function openEditSubscriptionDatesModal(id) {
+            editingSubscriptionDatesId = id;
+            const subscription = subscriptions.find(s => s.id === id);
+            
+            if (subscription) {
+                document.getElementById('editStartDateInput').value = subscription.startDate;
+                document.getElementById('editDurationInput').value = subscription.duration;
+                updateCalculatedEndDate();
+                document.getElementById('editSubscriptionDatesModal').style.display = 'flex';
+                document.getElementById('editStartDateInput').focus();
+            }
+        }
+        
+        function updateCalculatedEndDate() {
+            const startDateStr = document.getElementById('editStartDateInput').value;
+            const duration = parseInt(document.getElementById('editDurationInput').value);
+            
+            if (!startDateStr || !duration) return;
+            
+            // تحويل تاريخ البداية إلى كائن Date
+            const parts = startDateStr.split('/');
+            if (parts.length !== 3) return;
+            
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1; // الأشهر من 0-11 في JavaScript
+            const day = parseInt(parts[2]);
+            
+            const startDate = new Date(year, month, day);
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + duration);
+            
+            document.getElementById('calculatedEndDate').textContent = formatDate(endDate.getTime());
+        }
+        
+        function saveEditSubscriptionDates() {
+            const startDateStr = document.getElementById('editStartDateInput').value;
+            const duration = parseInt(document.getElementById('editDurationInput').value);
+            
+            if (!startDateStr || !duration || !editingSubscriptionDatesId) return;
+            
+            const subscription = subscriptions.find(s => s.id === editingSubscriptionDatesId);
+            if (!subscription) return;
+            
+            // تحقق من صحة تاريخ البداية
+            const parts = startDateStr.split('/');
+            if (parts.length !== 3) {
+                showToast('❌ صيغة التاريخ غير صحيحة. استخدم YYYY/MM/DD', 'error');
+                return;
+            }
+            
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1;
+            const day = parseInt(parts[2]);
+            
+            const startDate = new Date(year, month, day);
+            if (isNaN(startDate.getTime())) {
+                showToast('❌ تاريخ غير صالح', 'error');
+                return;
+            }
+            
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + duration);
+            
+            subscription.startDate = formatDate(startDate.getTime());
+            subscription.endDate = formatDate(endDate.getTime());
+            subscription.startTimestamp = startDate.getTime();
+            subscription.endTimestamp = endDate.getTime();
+            subscription.duration = duration;
+            subscription.durationText = getDurationText(duration);
+            
+            // تحديث الحالة بناءً على التاريخ الجديد
+            updateSubscriptionStatus(subscription);
+            
+            saveSubscriptionsData();
+            updateSubscriptions();
+            closeEditSubscriptionDatesModal();
+            showToast('✅ تم تحديث تواريخ الاشتراك', 'success');
+        }
+        
+        function closeEditSubscriptionDatesModal() {
+            document.getElementById('editSubscriptionDatesModal').style.display = 'none';
+            editingSubscriptionDatesId = null;
+        }
+        
+        function renewSubscription(id) {
+            currentSubscriptionId = id;
+            const subscription = subscriptions.find(s => s.id === id);
+            
+            document.getElementById('renewSubscriptionModalContent').innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <label>الاشتراك:</label>
+                    <div style="background: var(--border); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                        <strong>${subscription.subscriptionName}</strong>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label>المشترك:</label>
+                    <div style="background: var(--border); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                        <strong>${subscription.subscriberName}</strong>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label>تاريخ الانتهاء الحالي:</label>
+                    <div style="background: var(--border); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                        <strong>${subscription.endDate}</strong>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label>المدة الجديدة:</label>
+                    <select id="renewDuration" style="width: 100%; margin-top: 5px;">
+                        <option value="1">شهر واحد</option>
+                        <option value="2">شهرين</option>
+                        <option value="3">3 أشهر</option>
+                        <option value="6">6 أشهر</option>
+                        <option value="12">سنة كاملة</option>
+                    </select>
+                </div>
+            `;
+            
+            document.getElementById('renewSubscriptionModal').style.display = 'flex';
+            document.getElementById('renewDuration').focus();
+        }
+        
+        function saveRenewal() {
+            const duration = parseInt(document.getElementById('renewDuration').value);
+            
+            if (!duration || !currentSubscriptionId) return;
+            
+            const subscription = subscriptions.find(s => s.id === currentSubscriptionId);
+            if (!subscription) return;
+            
+            // تجديد الاشتراك - إضافة مدة جديدة إلى تاريخ الانتهاء الحالي
+            const currentEndDate = new Date(subscription.endTimestamp);
+            currentEndDate.setMonth(currentEndDate.getMonth() + duration);
+            
+            subscription.duration = duration;
+            subscription.durationText = getDurationText(duration);
+            subscription.endDate = formatDate(currentEndDate.getTime());
+            subscription.endTimestamp = currentEndDate.getTime();
+            
+            // تحديث الحالة
+            updateSubscriptionStatus(subscription);
+            
+            saveSubscriptionsData();
+            updateSubscriptions();
+            closeRenewSubscriptionModal();
+            
+            showToast(`✅ تم تجديد اشتراك ${subscription.subscriptionName} لمدة ${getDurationText(duration)}`, 'success');
+        }
+        
+        function closeRenewSubscriptionModal() {
+            document.getElementById('renewSubscriptionModal').style.display = 'none';
+            currentSubscriptionId = null;
+        }
+        
+        function deleteSubscription(id) {
+            if (confirm('هل تريد حذف هذا الاشتراك؟')) {
+                subscriptions = subscriptions.filter(s => s.id !== id);
+                saveSubscriptionsData();
+                updateSubscriptions();
+                showToast('✅ تم حذف الاشتراك', 'success');
+            }
+        }
+        
+        function clearAllSubscriptions() {
+            if (confirm('⚠️ هل تريد مسح جميع الاشتراكات؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                subscriptions = [];
+                saveSubscriptionsData();
+                updateSubscriptions();
+                showToast('🗑️ تم مسح جميع الاشتراكات', 'success');
+            }
+        }
+        
+        function filterSubscriptionsTable() {
+            const search = document.getElementById('subscriptionSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#subscriptionsBody tr');
+            
+            rows.forEach(row => {
+                const subscriptionName = row.querySelector('.subscription-badge')?.textContent?.toLowerCase() || '';
+                const subscriberName = row.querySelector('.debtor-badge')?.textContent?.toLowerCase() || '';
+                if (subscriptionName.includes(search) || subscriberName.includes(search)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        function sortSubscriptionsTable(column) {
+            if (subscriptionSortColumn === column) {
+                subscriptionSortDirection = subscriptionSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                subscriptionSortColumn = column;
+                subscriptionSortDirection = 'desc';
+            }
+            updateSubscriptionsTable();
+        }
+        
+        function exportSubscriptions() {
+            const dataStr = JSON.stringify(subscriptions, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', `GazanSystem-subscriptions-${formatDate(Date.now()).replace(/\//g, '-')}.json`);
+            link.click();
+            
+            showToast('✅ تم تصدير بيانات الاشتراكات', 'success');
+            document.getElementById('subscriptionsMoreOptions').classList.remove('show');
+        }
+        
+        function importSubscriptions() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        // التحقق من صحة البيانات
+                        if (!Array.isArray(importedData)) {
+                            throw new Error('صيغة الملف غير صحيحة');
+                        }
+                        
+                        // دمج البيانات المستوردة مع البيانات الحالية
+                        subscriptions = [...importedData, ...subscriptions];
+                        saveSubscriptionsData();
+                        updateSubscriptions();
+                        
+                        showToast(`✅ تم استيراد ${importedData.length} اشتراك`, 'success');
+                        document.getElementById('subscriptionsMoreOptions').classList.remove('show');
+                    } catch (error) {
+                        showToast('❌ خطأ في استيراد البيانات: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
         // === وظائف مساعدة ===
         function formatDate(timestamp) {
             const date = new Date(timestamp);
@@ -1949,6 +3022,10 @@
         
         function saveDebtsData() {
             localStorage.setItem('debtsData', JSON.stringify(debts));
+        }
+        
+        function saveSubscriptionsData() {
+            localStorage.setItem('subscriptionsData', JSON.stringify(subscriptions));
         }
         
         function formatNumber(num) {
@@ -2064,7 +3141,7 @@
             updateDebtsTable();
         }
         
-        console.log("🎯 النظام مع جميع التحديثات جاهز!");
+        console.log("🎯 Gazan System مع جميع التحديثات جاهز!");
     </script>
 </body>
 </html>
