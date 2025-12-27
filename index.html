@@ -126,6 +126,22 @@
             transform: translateY(-50%) scale(1.1);
         }
         
+        /* Global Controls */
+        .global-controls {
+            background: var(--light);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
         /* Page Navigation */
         .page-nav {
             display: flex;
@@ -163,6 +179,10 @@
         .page-btn.info { border-color: var(--info); }
         .page-btn.info.active { background: var(--info); border-color: var(--info); }
         .page-btn.info:hover { background: var(--info); border-color: var(--info); }
+        
+        .page-btn.referral { border-color: var(--secondary); }
+        .page-btn.referral.active { background: var(--secondary); border-color: var(--secondary); }
+        .page-btn.referral:hover { background: var(--secondary); border-color: var(--secondary); }
         
         /* Statistics Cards */
         .stats-grid {
@@ -468,13 +488,13 @@
             min-width: 250px;
         }
         
-        .transaction-table-wrapper, .debts-table-wrapper, .subscriptions-table-wrapper {
+        .transaction-table-wrapper, .debts-table-wrapper, .subscriptions-table-wrapper, .referrals-table-wrapper {
             overflow-x: auto;
             border-radius: 10px;
             border: 1px solid var(--border);
         }
         
-        .transaction-table, .debts-table, .subscriptions-table {
+        .transaction-table, .debts-table, .subscriptions-table, .referrals-table {
             width: 100%;
             border-collapse: collapse;
             min-width: 800px;
@@ -482,26 +502,28 @@
         
         .transaction-table th, .transaction-table td,
         .debts-table th, .debts-table td,
-        .subscriptions-table th, .subscriptions-table td {
+        .subscriptions-table th, .subscriptions-table td,
+        .referrals-table th, .referrals-table td {
             padding: 16px;
             text-align: center;
             border-bottom: 1px solid var(--border);
         }
         
-        .transaction-table th, .debts-table th, .subscriptions-table th {
+        .transaction-table th, .debts-table th, .subscriptions-table th, .referrals-table th {
             background: var(--dark);
             color: var(--light);
             position: relative;
             cursor: pointer;
         }
         
-        .transaction-table th:hover, .debts-table th:hover, .subscriptions-table th:hover {
+        .transaction-table th:hover, .debts-table th:hover, .subscriptions-table th:hover, .referrals-table th:hover {
             background: #34495e;
         }
         
         .normal { border-left: 4px solid var(--primary); }
         .flexy { border-left: 4px solid var(--secondary); }
         .subscription-row { border-left: 4px solid var(--info); }
+        .referral-row { border-left: 4px solid var(--secondary); }
         
         .type-badge {
             padding: 6px 15px;
@@ -684,6 +706,14 @@
             background: var(--info-dark);
         }
         
+        .timeline-btn {
+            background: var(--info);
+        }
+        
+        .timeline-btn:hover {
+            background: var(--info-dark);
+        }
+        
         /* More Button Styles */
         .more-btn-container {
             position: relative;
@@ -817,7 +847,7 @@
             padding: 30px;
             border-radius: 15px;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
@@ -826,6 +856,9 @@
             color: var(--dark);
             border-bottom: 2px solid var(--primary);
             padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .modal-actions {
@@ -834,6 +867,71 @@
             gap: 10px;
             margin-top: 25px;
         }
+        
+        /* Timeline Modal */
+        .timeline-modal .modal-content {
+            max-width: 800px;
+        }
+        
+        .timeline-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .timeline-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--light);
+            border-radius: 8px;
+            border-left: 4px solid;
+            border: 1px solid var(--border);
+        }
+        
+        .timeline-item.add {
+            border-left-color: var(--success);
+        }
+        
+        .timeline-item.update {
+            border-left-color: var(--warning);
+        }
+        
+        .timeline-item.paid {
+            border-left-color: var(--info);
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-amount {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .timeline-date {
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+        
+        .timeline-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        
+        .timeline-type {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .type-add { background: rgba(46, 204, 113, 0.2); color: var(--success); }
+        .type-update { background: rgba(243, 156, 18, 0.2); color: var(--warning); }
+        .type-paid { background: rgba(0, 188, 212, 0.2); color: var(--info); }
         
         /* Checkbox */
         .select-checkbox {
@@ -869,10 +967,11 @@
             .header h1 { font-size: 1.8em; }
             .stat-number { font-size: 2em; }
             .payment-options, .duration-options { flex-direction: column; }
-            .transaction-table, .debts-table, .subscriptions-table { min-width: 600px; }
+            .transaction-table, .debts-table, .subscriptions-table, .referrals-table { min-width: 600px; }
             .action-buttons { flex-direction: column; }
             .more-btn { padding: 10px 15px; }
             .more-options { min-width: 180px; }
+            .global-controls { flex-direction: column; }
         }
         
         @media (max-width: 480px) {
@@ -992,6 +1091,39 @@
             border-bottom: 1px solid var(--border);
         }
         
+        /* Referrals Page Specific */
+        .referral-progress {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .referral-progress-bar {
+            height: 100%;
+            transition: width 0.3s;
+        }
+        
+        .reward-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 2px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            cursor: pointer;
+        }
+        
+        .code-badge {
+            font-family: monospace;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+        
         @media (max-width: 768px) {
             .debt-form { grid-template-columns: 1fr; }
         }
@@ -1094,11 +1226,27 @@
             <p>إدارة المبيعات والمديونين والاشتراكات</p>
         </div>
         
+        <!-- Global Controls - محسنة -->
+        <div class="global-controls">
+            <button class="export-btn" onclick="exportAllData()" style="display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-database"></i> تصدير جميع البيانات
+            </button>
+            <button class="info-btn" onclick="importAllData()" style="display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-file-import"></i> استيراد جميع البيانات
+            </button>
+            <div style="margin-right: auto;">
+                <button class="clear-btn" onclick="clearAllData()" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-broom"></i> مسح جميع البيانات
+                </button>
+            </div>
+        </div>
+        
         <!-- Page Navigation -->
         <div class="page-nav">
             <button class="page-btn active" onclick="showPage('sales')">المبيعات</button>
             <button class="page-btn" onclick="showPage('debts')">المديونين</button>
             <button class="page-btn info" onclick="showPage('subscriptions')">الاشتراكات</button>
+            <button class="page-btn referral" onclick="showPage('referrals')">نظام الدعوات</button>
         </div>
         
         <!-- Sales Page -->
@@ -1310,8 +1458,9 @@
                                 <th>#</th>
                                 <th onclick="sortDebtsTable('name')">اسم المديون</th>
                                 <th onclick="sortDebtsTable('amount')">مبلغ الدين</th>
-                                <th onclick="sortDebtsTable('date')">التاريخ</th>
-                                <th style="width: 220px;">الإجراءات</th>
+                                <th onclick="sortDebtsTable('date')">تاريخ الإضافة</th>
+                                <th onclick="sortDebtsTable('lastUpdate')">آخر تحديث</th>
+                                <th style="width: 250px;">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="debtsBody"></tbody>
@@ -1467,6 +1616,126 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Referrals Page - صفحة نظام الدعوات -->
+        <div id="referrals-page" class="page-content">
+            <!-- Referrals Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <h3><i class="fas fa-user-friends"></i> إجمالي المشاركين</h3>
+                    <div class="stat-number blue-text" id="totalReferrers">0 شخص</div>
+                    <p id="activeReferrals">0 دعوة نشطة</p>
+                </div>
+                <div class="stat-card purple">
+                    <h3><i class="fas fa-gift"></i> مكافآت مستحقة</h3>
+                    <div class="stat-number purple-text" id="pendingRewards">0 مكافأة</div>
+                    <p>مكافآت تنتظر التسليم</p>
+                </div>
+                <div class="stat-card green">
+                    <h3><i class="fas fa-trophy"></i> مكافآت منجزة</h3>
+                    <div class="stat-number green-text" id="completedRewards">0 مكافأة</div>
+                    <p>مكافآت تم تسليمها</p>
+                </div>
+            </div>
+            
+            <!-- Add Referrer -->
+            <div class="controls">
+                <h3><i class="fas fa-user-plus"></i> إضافة شخص جديد لنظام الدعوات</h3>
+                
+                <div class="product-form">
+                    <input type="text" id="referrerName" placeholder="اسم الشخص" style="width: 100%;">
+                    <input type="text" id="referralCode" placeholder="كود الدعوة (أدخل يدوياً أو انقر توليد)" style="width: 100%;">
+                    <button class="info-btn" onclick="generateReferralCode()" style="min-width: auto; padding: 14px 20px;">
+                        <i class="fas fa-sync-alt"></i> توليد كود
+                    </button>
+                </div>
+                
+                <!-- Add Button -->
+                <div class="add-btn-container">
+                    <button class="add-btn" onclick="addReferrer()" style="background: var(--secondary);">
+                        <i class="fas fa-plus-circle"></i>
+                        إضافة الشخص
+                    </button>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <button class="clear-btn" onclick="clearAllReferrals()">
+                        <i class="fas fa-trash"></i> مسح جميع البيانات
+                    </button>
+                    
+                    <div class="more-btn-container">
+                        <button class="more-btn" onclick="toggleMoreOptions('referrals')" style="background: var(--secondary);">
+                            <i class="fas fa-ellipsis-h"></i> المزيد
+                        </button>
+                        <div class="more-options" id="referralsMoreOptions">
+                            <button class="option-btn export" onclick="exportReferrals()">
+                                <i class="fas fa-file-export"></i> تصدير البيانات
+                            </button>
+                            <button class="option-btn import" onclick="importReferrals()">
+                                <i class="fas fa-file-import"></i> استيراد البيانات
+                            </button>
+                            <button class="option-btn" onclick="showAllCodes()">
+                                <i class="fas fa-list"></i> عرض جميع الكودات
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Referral Entry Section -->
+            <div class="transactions" style="border-top: 3px solid var(--secondary);">
+                <h3 style="color: var(--secondary); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-user-check"></i> تسجيل دخول زبون بكود دعوة
+                </h3>
+                
+                <div style="background: var(--light); padding: 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px;">
+                    <div class="product-form" style="grid-template-columns: 1fr auto;">
+                        <input type="text" id="customerCode" placeholder="أدخل كود الدعوة هنا" style="width: 100%;">
+                        <button class="add-btn" onclick="useReferralCode()" style="min-width: 150px; background: var(--success);">
+                            <i class="fas fa-check-circle"></i> تأكيد الكود
+                        </button>
+                    </div>
+                    
+                    <!-- Code Validation Result -->
+                    <div id="codeValidationResult" style="margin-top: 15px; padding: 15px; border-radius: 8px; display: none;"></div>
+                    
+                    <!-- Quick Code Buttons -->
+                    <div style="margin-top: 20px;">
+                        <h4 style="margin-bottom: 10px; color: var(--secondary);">الكودات المتاحة:</h4>
+                        <div id="quickCodes" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            <!-- سيتم ملء الكودات الجاهزة هنا -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Referrers Table -->
+            <div class="transactions">
+                <div class="table-controls">
+                    <div class="search-box">
+                        <input type="text" id="referralSearchInput" placeholder="ابحث في الأشخاص أو الكودات..." style="width: 100%;" oninput="filterReferralsTable()">
+                    </div>
+                </div>
+                
+                <div class="referrals-table-wrapper">
+                    <table class="referrals-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th onclick="sortReferralsTable('name')">اسم الشخص</th>
+                                <th onclick="sortReferralsTable('code')">كود الدعوة</th>
+                                <th onclick="sortReferralsTable('count')">عدد الدعوات</th>
+                                <th onclick="sortReferralsTable('rewardStatus')">حالة المكافأة</th>
+                                <th onclick="sortReferralsTable('lastActivity')">آخر نشاط</th>
+                                <th style="width: 200px;">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referralsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Toast Container -->
@@ -1531,6 +1800,17 @@
         </div>
     </div>
     
+    <!-- Debt Timeline Modal -->
+    <div class="modal timeline-modal" id="debtTimelineModal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-history"></i> كشف تواقيت تحديثات الدين</h3>
+            <div id="debtTimelineContent"></div>
+            <div class="modal-actions">
+                <button onclick="closeDebtTimelineModal()" class="clear-btn"><i class="fas fa-times"></i> إغلاق</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- New Edit Modals -->
     <div class="edit-modal" id="editProductModal">
         <div class="edit-modal-content">
@@ -1542,20 +1822,6 @@
             <div class="edit-modal-actions">
                 <button onclick="saveEditProduct()" class="export-btn"><i class="fas fa-check"></i> حفظ</button>
                 <button onclick="closeEditProductModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="edit-modal" id="editDebtorModal">
-        <div class="edit-modal-content">
-            <h3 class="edit-modal-title"><i class="fas fa-user-edit"></i> تعديل اسم المديون</h3>
-            <div class="edit-form-group">
-                <label>اسم المديون الجديد:</label>
-                <input type="text" id="editDebtorNameInput" placeholder="أدخل الاسم الجديد">
-            </div>
-            <div class="edit-modal-actions">
-                <button onclick="saveEditDebtor()" class="export-btn"><i class="fas fa-check"></i> حفظ</button>
-                <button onclick="closeEditDebtorModal()" class="clear-btn"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </div>
     </div>
@@ -1629,9 +1895,11 @@
         let subscriptionDuration = 1;
         let paidDebtsCount = 0;
         
+        // متغيرات نظام الدعوات
+        let referrals = JSON.parse(localStorage.getItem('referralsData')) || [];
+        
         // متغيرات للتعديل
         let editingProductId = null;
-        let editingDebtorId = null;
         let editingSubscriptionId = null;
         let editingSubscriberId = null;
         let editingSubscriptionDatesId = null;
@@ -1649,6 +1917,8 @@
         let debtSortDirection = 'desc';
         let subscriptionSortColumn = 'timestamp';
         let subscriptionSortDirection = 'desc';
+        let referralSortColumn = 'timestamp';
+        let referralSortDirection = 'desc';
         
         document.addEventListener('DOMContentLoaded', function() {
             console.log("✅ Gazan System جاهز");
@@ -1665,6 +1935,7 @@
                     document.getElementById('salesMoreOptions').classList.remove('show');
                     document.getElementById('debtsMoreOptions').classList.remove('show');
                     document.getElementById('subscriptionsMoreOptions').classList.remove('show');
+                    document.getElementById('referralsMoreOptions').classList.remove('show');
                 }
             });
             
@@ -1694,6 +1965,8 @@
                 updateDebts();
             } else if (page === 'subscriptions') {
                 updateSubscriptions();
+            } else if (page === 'referrals') {
+                updateReferrals();
             }
         }
         
@@ -2132,11 +2405,13 @@
             const salesOptions = document.getElementById('salesMoreOptions');
             const debtsOptions = document.getElementById('debtsMoreOptions');
             const subscriptionsOptions = document.getElementById('subscriptionsMoreOptions');
+            const referralsOptions = document.getElementById('referralsMoreOptions');
             
             // إغلاق جميع القوائم أولاً
             salesOptions.classList.remove('show');
             debtsOptions.classList.remove('show');
             subscriptionsOptions.classList.remove('show');
+            referralsOptions.classList.remove('show');
             
             // فتح القائمة المطلوبة
             if (type === 'sales') {
@@ -2145,10 +2420,12 @@
                 debtsOptions.classList.toggle('show');
             } else if (type === 'subscriptions') {
                 subscriptionsOptions.classList.toggle('show');
+            } else if (type === 'referrals') {
+                referralsOptions.classList.toggle('show');
             }
         }
         
-        // === وظائف التصدير والاستيراد ===
+        // === وظائف التصدير والاستيراد المنفصلة ===
         function exportSalesData() {
             const dataStr = JSON.stringify(transactions, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -2257,7 +2534,15 @@
                 name: name,
                 amount: amount,
                 date: formatDate(timestamp),
-                timestamp: timestamp
+                timestamp: timestamp,
+                updates: [{
+                    amount: amount,
+                    date: formatDate(timestamp),
+                    timestamp: timestamp,
+                    type: 'add',
+                    description: 'إضافة دين جديد'
+                }],
+                lastUpdate: timestamp
             };
             
             // إضافة في بداية المصفوفة للحصول على الأحدث أولاً
@@ -2308,6 +2593,8 @@
                     return debtSortDirection === 'asc' ? a.amount - b.amount : b.amount - a.amount;
                 } else if (debtSortColumn === 'date') {
                     return debtSortDirection === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
+                } else if (debtSortColumn === 'lastUpdate') {
+                    return debtSortDirection === 'asc' ? (a.lastUpdate || a.timestamp) - (b.lastUpdate || b.timestamp) : (b.lastUpdate || b.timestamp) - (a.lastUpdate || a.timestamp);
                 }
                 return 0;
             });
@@ -2315,12 +2602,15 @@
             sortedDebts.forEach((d, index) => {
                 const isPaid = d.amount <= 0;
                 const badgeClass = isPaid ? 'paid' : '';
+                const lastUpdate = d.updates && d.updates.length > 0 ? 
+                    formatDate(d.updates[d.updates.length - 1].timestamp) : 
+                    formatDate(d.timestamp);
                 
                 const row = `
                     <tr>
                         <td>${index + 1}</td>
                         <td>
-                            <span class="debtor-badge ${badgeClass}" onclick="openEditDebtorModal(${d.id})">
+                            <span class="debtor-badge ${badgeClass}">
                                 ${d.name}
                                 ${isPaid ? ' (مسدد)' : ''}
                             </span>
@@ -2329,10 +2619,11 @@
                             ${formatNumber(d.amount)} دينار
                         </td>
                         <td class="date-cell">${d.date}</td>
+                        <td class="date-cell">${lastUpdate}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="action-btn edit-btn" onclick="openEditDebtorModal(${d.id})" title="تعديل الاسم">
-                                    <i class="fas fa-edit"></i> تعديل
+                                <button class="action-btn timeline-btn" onclick="showDebtTimeline(${d.id})" title="كشف تواقيت التحديثات">
+                                    <i class="fas fa-history"></i> تواقيت
                                 </button>
                                 <button class="action-btn update-btn" onclick="updateDebtAmount(${d.id})" title="تحديث المبلغ">
                                     <i class="fas fa-exchange-alt"></i> تحديث
@@ -2348,35 +2639,60 @@
             });
         }
         
-        // === وظائف تعديل المديونين (النافذة الجديدة) ===
-        function openEditDebtorModal(id) {
-            editingDebtorId = id;
-            const debtor = debts.find(d => d.id === id);
-            
-            if (debtor) {
-                document.getElementById('editDebtorNameInput').value = debtor.name;
-                document.getElementById('editDebtorModal').style.display = 'flex';
-                document.getElementById('editDebtorNameInput').focus();
+        // === وظائف كشف تواقيت التحديثات ===
+        function showDebtTimeline(id) {
+            const debt = debts.find(d => d.id === id);
+            if (!debt || !debt.updates || debt.updates.length === 0) {
+                showToast('⚠️ لا توجد تواقيت تحديث لهذا الدين', 'warning');
+                return;
             }
+            
+            // ترتيب التحديثات من الأحدث إلى الأقدم
+            const sortedUpdates = [...debt.updates].sort((a, b) => b.timestamp - a.timestamp);
+            
+            let timelineHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="text-align: center; color: var(--primary); margin-bottom: 15px;">
+                        <i class="fas fa-user"></i> ${debt.name}
+                    </h4>
+                    <div style="background: var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                        <strong>المبلغ الحالي: ${formatNumber(debt.amount)} دينار</strong>
+                    </div>
+                </div>
+                <div class="timeline-container">
+            `;
+            
+            sortedUpdates.forEach((update, index) => {
+                const updateType = update.type || 'update';
+                const typeText = updateType === 'add' ? 'إضافة' : updateType === 'paid' ? 'سداد' : 'تحديث';
+                const typeClass = updateType === 'add' ? 'add' : updateType === 'paid' ? 'paid' : 'update';
+                const typeLabel = updateType === 'add' ? 'type-add' : updateType === 'paid' ? 'type-paid' : 'type-update';
+                const amountClass = update.amount >= 0 ? 'green-text' : 'red-text';
+                const amountSign = update.amount >= 0 ? '+' : '';
+                
+                timelineHTML += `
+                    <div class="timeline-item ${typeClass}">
+                        <div class="timeline-header">
+                            <div class="timeline-amount ${amountClass}">${amountSign}${formatNumber(update.amount)} دينار</div>
+                            <div class="timeline-date">${update.date}</div>
+                        </div>
+                        <div style="margin: 5px 0;">${update.description || 'تحديث مبلغ الدين'}</div>
+                        <div class="timeline-details">
+                            <span class="timeline-type ${typeLabel}">${typeText}</span>
+                            <small>${index === 0 ? 'آخر تحديث' : ''}</small>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            timelineHTML += `</div>`;
+            
+            document.getElementById('debtTimelineContent').innerHTML = timelineHTML;
+            document.getElementById('debtTimelineModal').style.display = 'flex';
         }
         
-        function saveEditDebtor() {
-            const newName = document.getElementById('editDebtorNameInput').value.trim();
-            if (!newName || !editingDebtorId) return;
-            
-            const debtor = debts.find(d => d.id === editingDebtorId);
-            if (debtor) {
-                debtor.name = newName;
-                saveDebtsData();
-                updateDebts();
-                closeEditDebtorModal();
-                showToast('✅ تم تحديث اسم المديون', 'success');
-            }
-        }
-        
-        function closeEditDebtorModal() {
-            document.getElementById('editDebtorModal').style.display = 'none';
-            editingDebtorId = null;
+        function closeDebtTimelineModal() {
+            document.getElementById('debtTimelineModal').style.display = 'none';
         }
         
         // === خاصية الحذف التلقائي عند وصول الدين للصفر ===
@@ -2389,6 +2705,17 @@
                     debt.markedForDeletion = true;
                     deletedCount++;
                     paidDebtsCount++;
+                    
+                    // إضافة تحديث سداد
+                    if (!debt.updates) debt.updates = [];
+                    debt.updates.push({
+                        amount: 0,
+                        date: formatDate(Date.now()),
+                        timestamp: Date.now(),
+                        type: 'paid',
+                        description: 'تم سداد الدين بالكامل'
+                    });
+                    debt.lastUpdate = Date.now();
                 }
             });
             
@@ -2426,6 +2753,10 @@
                     <label>تحديث المبلغ (استخدم + للزيادة و - للنقصان):</label>
                     <input type="text" id="debtUpdateAmount" placeholder="مثال: +100 أو -50 أو 200" style="width: 100%; margin-top: 5px;">
                 </div>
+                <div style="margin-bottom: 10px;">
+                    <label>الوصف (اختياري):</label>
+                    <input type="text" id="debtUpdateDescription" placeholder="مثال: سداد جزئي، زيادة دين، إلخ" style="width: 100%; margin-top: 5px;">
+                </div>
             `;
             
             document.getElementById('updateDebtModal').style.display = 'flex';
@@ -2434,25 +2765,58 @@
         
         function saveDebtUpdate() {
             const input = document.getElementById('debtUpdateAmount').value.trim();
+            const description = document.getElementById('debtUpdateDescription').value.trim();
             if (!input || !currentDebtorId) return;
             
             const debt = debts.find(d => d.id === currentDebtorId);
             if (!debt) return;
             
             let newAmount = debt.amount;
+            let updateAmount = 0;
+            let updateType = 'update';
             
             if (input.startsWith('+')) {
                 const amount = parseFloat(input.substring(1)) || 0;
                 newAmount = debt.amount + amount;
+                updateAmount = amount;
+                updateType = 'increase';
             } else if (input.startsWith('-')) {
                 const amount = parseFloat(input.substring(1)) || 0;
                 newAmount = debt.amount - amount;
+                updateAmount = -amount;
+                updateType = 'decrease';
             } else {
                 newAmount = parseFloat(input) || debt.amount;
+                updateAmount = newAmount - debt.amount;
             }
             
             if (!isNaN(newAmount)) {
+                const oldAmount = debt.amount;
                 debt.amount = newAmount;
+                debt.lastUpdate = Date.now();
+                
+                // إضافة تحديث جديد إلى السجل
+                if (!debt.updates) debt.updates = [];
+                
+                let updateDescription = description || `تحديث المبلغ من ${formatNumber(oldAmount)} إلى ${formatNumber(newAmount)} دينار`;
+                if (!description) {
+                    if (updateAmount > 0) {
+                        updateDescription = `زيادة الدين بمقدار ${formatNumber(updateAmount)} دينار`;
+                    } else if (updateAmount < 0) {
+                        updateDescription = `تخفيض الدين بمقدار ${formatNumber(Math.abs(updateAmount))} دينار`;
+                    } else {
+                        updateDescription = `تحديث المبلغ إلى ${formatNumber(newAmount)} دينار`;
+                    }
+                }
+                
+                debt.updates.push({
+                    amount: updateAmount,
+                    date: formatDate(Date.now()),
+                    timestamp: Date.now(),
+                    type: updateType,
+                    description: updateDescription
+                });
+                
                 saveDebtsData();
                 updateDebts();
                 closeUpdateDebtModal();
@@ -3007,6 +3371,572 @@
             input.click();
         }
         
+        // === وظائف نظام الدعوات ===
+        function generateReferralCode() {
+            // إنشاء كود فريد مكون من 8 خانات (أحرف وأرقام)
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            
+            document.getElementById('referralCode').value = code;
+        }
+        
+        function addReferrer() {
+            const name = document.getElementById('referrerName').value.trim();
+            const code = document.getElementById('referralCode').value.trim().toUpperCase();
+            
+            if (!name || !code) {
+                showToast('⚠️ أدخل اسم الشخص والكود', 'error');
+                return;
+            }
+            
+            // التحقق من عدم تكرار الكود
+            const existingCode = referrals.find(r => r.code === code);
+            if (existingCode) {
+                showToast('⚠️ هذا الكود مستخدم بالفعل، استخدم كود آخر', 'error');
+                return;
+            }
+            
+            const timestamp = Date.now();
+            const referrer = {
+                id: timestamp,
+                name: name,
+                code: code,
+                referralCount: 0,
+                rewardsEarned: 0,
+                status: 'active',
+                date: formatDate(timestamp),
+                timestamp: timestamp,
+                lastActivity: timestamp,
+                target: 9, // يحتاج إلى 9 أشخاص للحصول على المكافأة
+                progress: 0 // عدد الأشخاص الحالي
+            };
+            
+            // إضافة في بداية المصفوفة
+            referrals.unshift(referrer);
+            saveReferralsData();
+            updateReferrals();
+            
+            // مسح الحقول
+            document.getElementById('referrerName').value = '';
+            document.getElementById('referralCode').value = '';
+            
+            showToast(`✅ تم إضافة ${name} بنجاح! الكود: ${code}`, 'success');
+            updateQuickCodes();
+        }
+        
+        function useReferralCode() {
+            const code = document.getElementById('customerCode').value.trim().toUpperCase();
+            
+            if (!code) {
+                showToast('⚠️ أدخل كود الدعوة', 'error');
+                return;
+            }
+            
+            const referrer = referrals.find(r => r.code === code);
+            const resultDiv = document.getElementById('codeValidationResult');
+            
+            if (!referrer) {
+                resultDiv.innerHTML = `
+                    <div style="color: var(--danger); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-times-circle"></i>
+                        <div>
+                            <strong>❌ كود غير صالح</strong>
+                            <p style="margin: 5px 0 0 0;">هذا الكود غير موجود في النظام</p>
+                        </div>
+                    </div>
+                `;
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = 'rgba(231, 76, 60, 0.1)';
+                resultDiv.style.border = '1px solid var(--danger)';
+                return;
+            }
+            
+            // زيادة عدد الدعوات
+            referrer.referralCount++;
+            referrer.progress++;
+            referrer.lastActivity = Date.now();
+            
+            // التحقق من وصوله للهدف
+            if (referrer.progress >= referrer.target) {
+                referrer.rewardsEarned++;
+                referrer.progress = 0; // إعادة الضبط ليبدأ من جديد
+                referrer.status = 'reward_earned';
+                
+                resultDiv.innerHTML = `
+                    <div style="color: var(--success); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-trophy"></i>
+                        <div>
+                            <strong>🎉 مبروك! ${referrer.name} حصل على مكافأة!</strong>
+                            <p style="margin: 5px 0 0 0;">تم الوصول إلى ${referrer.target} أشخاص. الكود: ${code}</p>
+                            <p style="margin: 5px 0 0 0;">إجمالي المكافآت: ${referrer.rewardsEarned}</p>
+                        </div>
+                    </div>
+                `;
+                showToast(`🎊 ${referrer.name} حصل على مكافأة مجانية!`, 'success');
+            } else {
+                resultDiv.innerHTML = `
+                    <div style="color: var(--success); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>✅ تم تسجيل الدعوة بنجاح!</strong>
+                            <p style="margin: 5px 0 0 0;">الكود: ${code} - لصالح: ${referrer.name}</p>
+                            <p style="margin: 5px 0 0 0;">التقدم: ${referrer.progress}/${referrer.target} (${Math.round((referrer.progress/referrer.target)*100)}%)</p>
+                        </div>
+                    </div>
+                `;
+                showToast(`✅ تم تسجيل دعوة لصالح ${referrer.name}`, 'success');
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = 'rgba(46, 204, 113, 0.1)';
+            resultDiv.style.border = '1px solid var(--success)';
+            
+            // حفظ البيانات وتحديث العرض
+            saveReferralsData();
+            updateReferrals();
+            
+            // مسح حقل الإدخال
+            document.getElementById('customerCode').value = '';
+        }
+        
+        function updateReferrals() {
+            updateReferralsStatistics();
+            updateReferralsTable();
+            updateQuickCodes();
+        }
+        
+        function updateReferralsStatistics() {
+            const activeReferrals = referrals.filter(r => r.status === 'active');
+            const pendingRewards = referrals.filter(r => r.status === 'reward_earned').length;
+            const completedRewards = referrals.reduce((sum, r) => sum + r.rewardsEarned, 0);
+            
+            document.getElementById('totalReferrers').textContent = referrals.length + ' شخص';
+            document.getElementById('activeReferrals').textContent = activeReferrals.length + ' دعوة نشطة';
+            document.getElementById('pendingRewards').textContent = pendingRewards + ' مكافأة';
+            document.getElementById('completedRewards').textContent = completedRewards + ' مكافأة';
+        }
+        
+        function updateReferralsTable() {
+            const tbody = document.getElementById('referralsBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            // ترتيب المشاركين من الأحدث إلى الأقدم
+            const sortedReferrals = [...referrals].sort((a, b) => {
+                if (referralSortColumn === 'timestamp') {
+                    return referralSortDirection === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp;
+                } else if (referralSortColumn === 'name') {
+                    return referralSortDirection === 'asc' 
+                        ? a.name.localeCompare(b.name)
+                        : b.name.localeCompare(a.name);
+                } else if (referralSortColumn === 'count') {
+                    return referralSortDirection === 'asc' ? a.referralCount - b.referralCount : b.referralCount - a.referralCount;
+                } else if (referralSortColumn === 'lastActivity') {
+                    return referralSortDirection === 'asc' ? a.lastActivity - b.lastActivity : b.lastActivity - a.lastActivity;
+                }
+                return 0;
+            });
+            
+            sortedReferrals.forEach((r, index) => {
+                const progressPercentage = Math.round((r.progress / r.target) * 100);
+                const progressColor = progressPercentage >= 100 ? 'var(--success)' : 
+                                     progressPercentage >= 70 ? 'var(--warning)' : 'var(--primary)';
+                
+                const statusText = r.status === 'reward_earned' ? 'مستحق للمكافأة' : 
+                                  r.status === 'inactive' ? 'غير نشط' : 'نشط';
+                const statusClass = r.status === 'reward_earned' ? 'status-active' : 
+                                   r.status === 'inactive' ? 'status-expired' : 'status-soon';
+                
+                const row = `
+                    <tr class="referral-row">
+                        <td>${index + 1}</td>
+                        <td>
+                            <span class="debtor-badge" style="background: linear-gradient(45deg, var(--secondary), var(--secondary-dark));">
+                                ${r.name}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="subscription-badge code-badge" onclick="copyToClipboard('${r.code}')" title="انقر للنسخ" style="cursor: pointer; font-family: monospace; background: linear-gradient(45deg, var(--secondary), var(--secondary-dark));">
+                                ${r.code}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="margin-bottom: 5px;">
+                                <strong>${r.progress}/${r.target}</strong> (${progressPercentage}%)
+                            </div>
+                            <div class="referral-progress">
+                                <div class="referral-progress-bar" style="width: ${progressPercentage}%; background: ${progressColor};"></div>
+                            </div>
+                            <small style="color: var(--gray);">إجمالي الدعوات: ${r.referralCount}</small>
+                        </td>
+                        <td>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            ${r.rewardsEarned > 0 ? `<br><small>حصل على: ${r.rewardsEarned} مكافأة</small>` : ''}
+                        </td>
+                        <td class="date-cell">${formatDate(r.lastActivity)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn edit-btn" onclick="editReferrer(${r.id})" title="تعديل البيانات">
+                                    <i class="fas fa-edit"></i> تعديل
+                                </button>
+                                <button class="action-btn renew-btn" onclick="resetReferrerProgress(${r.id})" title="إعادة تعيين التقدم">
+                                    <i class="fas fa-redo"></i> إعادة تعيين
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteReferrer(${r.id})" title="حذف المشارك">
+                                    <i class="fas fa-trash"></i> حذف
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+        
+        function updateQuickCodes() {
+            const quickCodesDiv = document.getElementById('quickCodes');
+            if (!quickCodesDiv) return;
+            
+            // عرض جميع الكودات النشطة
+            const activeReferrals = referrals.filter(r => r.status !== 'inactive');
+            
+            quickCodesDiv.innerHTML = '';
+            
+            if (activeReferrals.length === 0) {
+                quickCodesDiv.innerHTML = '<p style="color: var(--gray);">لا توجد كودات متاحة</p>';
+                return;
+            }
+            
+            activeReferrals.forEach(r => {
+                const button = document.createElement('button');
+                button.className = 'product-badge';
+                button.style.cursor = 'pointer';
+                button.style.background = 'linear-gradient(45deg, var(--secondary), var(--secondary-dark))';
+                button.innerHTML = `
+                    ${r.code}
+                    <br>
+                    <small>${r.name} (${r.progress}/${r.target})</small>
+                `;
+                button.onclick = () => {
+                    document.getElementById('customerCode').value = r.code;
+                    document.getElementById('customerCode').focus();
+                };
+                quickCodesDiv.appendChild(button);
+            });
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ تم نسخ الكود: ' + text, 'success');
+            });
+        }
+        
+        function editReferrer(id) {
+            const referrer = referrals.find(r => r.id === id);
+            if (!referrer) return;
+            
+            const newName = prompt('أدخل الاسم الجديد:', referrer.name);
+            if (newName && newName.trim()) {
+                referrer.name = newName.trim();
+                saveReferralsData();
+                updateReferrals();
+                showToast('✅ تم تحديث الاسم', 'success');
+            }
+        }
+        
+        function resetReferrerProgress(id) {
+            if (confirm('هل تريد إعادة تعيين تقدم هذا الشخص؟ سيتم فقدان عدد الأشخاص الحالي.')) {
+                const referrer = referrals.find(r => r.id === id);
+                if (referrer) {
+                    referrer.progress = 0;
+                    referrer.status = 'active';
+                    saveReferralsData();
+                    updateReferrals();
+                    showToast('✅ تم إعادة تعيين التقدم', 'success');
+                }
+            }
+        }
+        
+        function deleteReferrer(id) {
+            if (confirm('هل تريد حذف هذا الشخص من نظام الدعوات؟')) {
+                referrals = referrals.filter(r => r.id !== id);
+                saveReferralsData();
+                updateReferrals();
+                showToast('✅ تم حذف الشخص', 'success');
+            }
+        }
+        
+        function clearAllReferrals() {
+            if (confirm('⚠️ هل تريد مسح جميع بيانات نظام الدعوات؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                referrals = [];
+                saveReferralsData();
+                updateReferrals();
+                showToast('🗑️ تم مسح جميع بيانات الدعوات', 'success');
+            }
+        }
+        
+        function filterReferralsTable() {
+            const search = document.getElementById('referralSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#referralsBody tr');
+            
+            rows.forEach(row => {
+                const name = row.querySelector('.debtor-badge')?.textContent?.toLowerCase() || '';
+                const code = row.querySelector('.subscription-badge')?.textContent?.toLowerCase() || '';
+                if (name.includes(search) || code.includes(search)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        function sortReferralsTable(column) {
+            if (referralSortColumn === column) {
+                referralSortDirection = referralSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                referralSortColumn = column;
+                referralSortDirection = 'desc';
+            }
+            updateReferralsTable();
+        }
+        
+        function saveReferralsData() {
+            localStorage.setItem('referralsData', JSON.stringify(referrals));
+        }
+        
+        function exportReferrals() {
+            const data = {
+                referrals: referrals,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', `GazanSystem-referrals-${formatDate(Date.now()).replace(/\//g, '-')}.json`);
+            link.click();
+            
+            showToast('✅ تم تصدير بيانات نظام الدعوات', 'success');
+            document.getElementById('referralsMoreOptions').classList.remove('show');
+        }
+        
+        function importReferrals() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (importedData.referrals) {
+                            referrals = [...importedData.referrals, ...referrals];
+                        }
+                        
+                        saveReferralsData();
+                        updateReferrals();
+                        
+                        showToast('✅ تم استيراد بيانات نظام الدعوات', 'success');
+                        document.getElementById('referralsMoreOptions').classList.remove('show');
+                    } catch (error) {
+                        showToast('❌ خطأ في استيراد البيانات', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        function showAllCodes() {
+            let codesList = 'الكودات المتاحة:\n\n';
+            referrals.forEach(r => {
+                codesList += `${r.code} - ${r.name} (${r.progress}/${r.target})\n`;
+            });
+            
+            alert(codesList);
+            document.getElementById('referralsMoreOptions').classList.remove('show');
+        }
+        
+        // === وظائف تصدير واستيراد جميع البيانات ===
+        function exportAllData() {
+            const allData = {
+                // معلومات النظام
+                systemInfo: {
+                    name: "Gazan System",
+                    version: "2.0",
+                    exportDate: new Date().toISOString(),
+                    exportTimestamp: Date.now(),
+                    dataFormat: "all-in-one"
+                },
+                
+                // جميع البيانات
+                data: {
+                    sales: transactions,
+                    debts: debts,
+                    subscriptions: subscriptions,
+                    referrals: referrals
+                },
+                
+                // الإحصائيات
+                statistics: {
+                    totalSales: transactions.length,
+                    totalDebts: debts.length,
+                    totalSubscriptions: subscriptions.length,
+                    totalReferrals: referrals.length
+                }
+            };
+            
+            // تنسيق JSON بشكل جميل مع علامات تاريخية
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            
+            // إنشاء اسم ملف مع تاريخ التصدير
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const fileName = `GazanSystem-FULL-BACKUP-${dateStr}.json`;
+            
+            // تنزيل الملف
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', fileName);
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast(`✅ تم تصدير جميع البيانات (${allData.statistics.totalSales + allData.statistics.totalDebts + allData.statistics.totalSubscriptions + allData.statistics.totalReferrals} سجلات)`, 'success');
+        }
+        
+        function importAllData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        // التحقق من صحة الملف
+                        if (!importedData.systemInfo || !importedData.data) {
+                            showToast('❌ ملف غير صالح: لا يحتوي على بيانات النظام', 'error');
+                            return;
+                        }
+                        
+                        // تأكيد الاستيراد
+                        if (!confirm(`هل تريد استيراد جميع البيانات؟\n\n📊 المبيعات: ${importedData.statistics?.totalSales || 0} عملية\n📉 الديون: ${importedData.statistics?.totalDebts || 0} دين\n📱 الاشتراكات: ${importedData.statistics?.totalSubscriptions || 0} اشتراك\n🎁 الدعوات: ${importedData.statistics?.totalReferrals || 0} شخص\n\n⚠️ سيتم استبدال البيانات الحالية!`)) {
+                            return;
+                        }
+                        
+                        // استيراد البيانات مع الاحتفاظ بالبيانات الحالية أو استبدالها
+                        const importMode = prompt(
+                            'اختر طريقة الاستيراد:\n1 - استبدال جميع البيانات (سيحذف القديم)\n2 - دمج البيانات (إضافة الجديد مع القديم)\n\nأدخل 1 أو 2:',
+                            '2'
+                        );
+                        
+                        if (importMode === '1') {
+                            // استبدال كامل
+                            transactions = importedData.data.sales || [];
+                            debts = importedData.data.debts || [];
+                            subscriptions = importedData.data.subscriptions || [];
+                            referrals = importedData.data.referrals || [];
+                            paidDebtsCount = importedData.data.debtsSummary?.paidDebts || 0;
+                            
+                            showToast('🔄 تم استبدال جميع البيانات', 'success');
+                        } else if (importMode === '2') {
+                            // دمج البيانات (إضافة الجديد للأول)
+                            if (importedData.data.sales) {
+                                transactions = [...importedData.data.sales, ...transactions];
+                            }
+                            if (importedData.data.debts) {
+                                debts = [...importedData.data.debts, ...debts];
+                            }
+                            if (importedData.data.subscriptions) {
+                                subscriptions = [...importedData.data.subscriptions, ...subscriptions];
+                            }
+                            if (importedData.data.referrals) {
+                                referrals = [...importedData.data.referrals, ...referrals];
+                            }
+                            if (importedData.data.debtsSummary?.paidDebts) {
+                                paidDebtsCount += importedData.data.debtsSummary.paidDebts;
+                            }
+                            
+                            showToast('🔄 تم دمج البيانات مع البيانات الحالية', 'success');
+                        } else {
+                            showToast('❌ تم إلغاء الاستيراد', 'error');
+                            return;
+                        }
+                        
+                        // حفظ جميع البيانات
+                        saveAllData();
+                        
+                        // تحديث جميع الصفحات
+                        updateSales();
+                        updateDebts();
+                        updateSubscriptions();
+                        updateReferrals();
+                        
+                        showToast('✅ تم استيراد جميع البيانات بنجاح', 'success');
+                        
+                    } catch (error) {
+                        console.error('Import error:', error);
+                        showToast('❌ خطأ في استيراد الملف: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        function saveAllData() {
+            saveSalesData();
+            saveDebtsData();
+            saveSubscriptionsData();
+            saveReferralsData();
+        }
+        
+        function clearAllData() {
+            if (!confirm(`⚠️ ⚠️ ⚠️ تحذير خطير!\n\nهل تريد مسح جميع البيانات في النظام؟\n\nهذا يشمل:\n• جميع المبيعات (${transactions.length} عملية)\n• جميع الديون (${debts.length} دين)\n• جميع الاشتراكات (${subscriptions.length} اشتراك)\n• جميع بيانات الدعوات (${referrals.length} شخص)\n\n❌ هذا الإجراء لا يمكن التراجع عنه!`)) {
+                return;
+            }
+            
+            const password = prompt('⚠️ لأسباب أمنية، أكد مسح جميع البيانات بأدخل الرقم: 12345');
+            if (password !== '12345') {
+                showToast('❌ تم إلغاء المسح', 'error');
+                return;
+            }
+            
+            // مسح جميع البيانات
+            transactions = [];
+            debts = [];
+            subscriptions = [];
+            referrals = [];
+            paidDebtsCount = 0;
+            
+            // مسح التخزين المحلي
+            localStorage.clear();
+            
+            // تحديث جميع الصفحات
+            updateSales();
+            updateDebts();
+            updateSubscriptions();
+            updateReferrals();
+            
+            showToast('🗑️ تم مسح جميع بيانات النظام', 'success');
+        }
+        
         // === وظائف مساعدة ===
         function formatDate(timestamp) {
             const date = new Date(timestamp);
@@ -3141,7 +4071,7 @@
             updateDebtsTable();
         }
         
-        console.log("🎯 Gazan System مع جميع التحديثات جاهز!");
+        console.log("🎯 Gazan System مع النظام المحسّن جاهز!");
     </script>
 </body>
 </html>
